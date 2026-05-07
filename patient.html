@@ -1,0 +1,4029 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>LifeCard Patient</title>
+<style>
+:root {
+  --bg: #0A1628;
+  --surface: #F5F7FA;
+  --card: #FFFFFF;
+  --text: #1A1A2E;
+  --text-sec: #5A6475;
+  --border: #E4E8EF;
+  --blue: #1565C0;
+  --blue-dark: #0D47A1;
+  --blue-light: #E3F2FD;
+  --red: #E53935;
+  --red-light: #FFEBEE;
+  --green: #2E7D32;
+  --green-light: #E8F5E9;
+  --orange: #E65100;
+  --orange-light: #FFF3E0;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --tr: 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="dark"] {
+  --surface: #111827;
+  --card: #1F2937;
+  --text: #F9FAFB;
+  --text-sec: #9CA3AF;
+  --border: #374151;
+  --blue-light: #1E3A5F;
+  --red-light: #3B1212;
+  --green-light: #14291A;
+  --orange-light: #2D1A00;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;overflow:hidden;
+  transition:background .3s;
+}
+.phone{
+  width:100%;max-width:420px;height:100dvh;max-height:900px;
+  background:var(--surface);position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:background .3s;
+}
+@media(min-width:500px){
+  .phone{border-radius:40px;box-shadow:0 40px 80px rgba(0,0,0,0.5);border:8px solid #1C2A3A;}
+}
+@media(max-height:600px){
+  .auth-logo{padding:10px 20px 6px;}
+  .auth-logo-icon{font-size:32px;margin-bottom:2px;}
+  .auth-logo-title{font-size:18px;}
+  .auth-form{gap:8px;}
+  .auth-input-group input,.auth-input-group select{padding:9px 12px;font-size:13px;}
+  .btn-auth{padding:11px;font-size:14px;}
+}
+@media(max-width:380px){
+  .quick-cards{gap:8px;}
+  .qcard{padding:10px;}
+  .qcard-label{font-size:9px;}
+  .qcard-value{font-size:18px;}
+  .health-chips{gap:6px;}
+  .health-chip{padding:3px 10px;font-size:11px;}
+  .section-header-sm{padding:12px 12px 6px;}
+  .act-item{padding:10px 12px;}
+}
+@media(max-width:320px){
+  .phone{max-width:100%;}
+  .auth-logo-title{font-size:18px;}
+  .auth-form{gap:8px;padding:0 16px 16px;}
+  .qcard-value{font-size:16px;}
+  .health-hero-name{font-size:16px;}
+  .alert-card{padding:10px 12px;gap:10px;}
+  .alert-title{font-size:12px;}
+  .alert-desc{font-size:11px;}
+}
+.screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  background:var(--surface);
+  transform:translateX(100%);
+  transition:transform var(--tr);
+  overflow:hidden;
+}
+.screen.active{transform:translateX(0);}
+.screen.slide-left{transform:translateX(-40%);}
+.screen.animate-in{animation:screenEnter 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+.screen.animate-out{animation:screenExit 0.3s ease-in forwards;}
+@keyframes screenEnter{0%{transform:translateX(100%);opacity:0;}100%{transform:translateX(0);opacity:1;}}
+@keyframes screenExit{0%{transform:translateX(0);opacity:1;}100%{transform:translateX(-40%);opacity:0.5;}}
+.scroll-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.scroll-content::-webkit-scrollbar{display:none;}
+.status-bar{
+  padding:10px 20px 4px;display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;font-weight:600;color:var(--text-sec);flex-shrink:0;
+}
+.status-bar.dark{background:var(--blue);color:rgba(255,255,255,0.9);}
+.status-icons{display:flex;gap:6px;align-items:center;}
+
+/* LOGIN / REGISTER */
+#login,#register{
+  background:linear-gradient(160deg,#0A1628 0%,#1565C0 100%);
+}
+#login.active,#register.active{transform:translateX(0);}
+#login .scroll-content,#register .scroll-content{
+  display:flex;flex-direction:column;justify-content:center;
+}
+.auth-logo{text-align:center;padding:20px 20px 12px;}
+.auth-logo-icon{font-size:44px;margin-bottom:6px;}
+.auth-logo-title{color:#fff;font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+.auth-logo-sub{color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px;}
+.auth-form{padding:0 24px 20px;display:flex;flex-direction:column;gap:12px;}
+.auth-input-group{display:flex;flex-direction:column;gap:5px;}
+.auth-input-group label{color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;}
+.auth-input-group input,.auth-input-group select{
+  padding:12px 16px;border-radius:var(--radius-sm);
+  border:1.5px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.1);
+  color:#fff;font-size:15px;outline:none;
+  font-family:var(--font);transition:all 0.2s;
+}
+.auth-input-group select option{background:#1565C0;color:#fff;}
+.auth-input-group input::placeholder{color:rgba(255,255,255,0.35);}
+.auth-input-group input:focus{border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.18);}
+.pass-wrap{position:relative;}
+.pass-wrap input{width:100%;padding-right:44px;}
+.eye-btn{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:18px;
+  color:rgba(255,255,255,0.5);padding:4px;
+}
+.auth-error{color:#FF8A80;font-size:13px;font-weight:600;text-align:center;display:none;}
+.btn-auth{
+  width:100%;padding:14px;background:#fff;color:var(--blue);
+  border:none;border-radius:var(--radius);font-size:16px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(0,0,0,0.2);margin-top:4px;
+  position:relative;overflow:hidden;
+}
+.btn-auth::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;
+  background:rgba(21,101,192,0.1);border-radius:50%;transform:translate(-50%,-50%);
+  transition:width 0.6s,height 0.6s;
+}
+.btn-auth:active::before{width:300px;height:300px;}
+.btn-auth:hover{box-shadow:0 6px 24px rgba(0,0,0,0.3);}
+.btn-auth:active{transform:scale(0.96);}
+.btn-auth:disabled{opacity:0.65;cursor:not-allowed;transform:none;}
+.auth-switch{text-align:center;color:rgba(255,255,255,0.55);font-size:13px;padding:6px 0;}
+.auth-switch span{color:#fff;font-weight:700;cursor:pointer;text-decoration:underline;}
+.auth-footer{padding:12px;text-align:center;}
+.auth-footer p{color:rgba(255,255,255,0.2);font-size:11px;}
+
+/* HOME SCREEN */
+.home-header{
+  background:linear-gradient(135deg,#1565C0,#0A1628);
+  padding:16px 20px 32px;flex-shrink:0;position:relative;overflow:hidden;
+}
+.home-header::after{
+  content:'';position:absolute;bottom:-20px;left:-20px;right:-20px;
+  height:40px;background:var(--surface);border-radius:50% 50% 0 0;
+}
+.home-top{display:flex;justify-content:space-between;align-items:center;}
+.home-greeting{color:rgba(255,255,255,0.65);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.home-name{color:#fff;font-size:20px;font-weight:800;margin-top:2px;}
+.home-pid{color:rgba(255,255,255,0.5);font-size:11px;margin-top:2px;}
+.home-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);
+  display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;
+}
+.status-banner{
+  margin:20px 16px 8px;padding:14px 16px;border-radius:var(--radius);
+  display:flex;align-items:center;gap:12px;
+  animation:slideDown 0.5s ease-out;
+}
+@keyframes slideDown{0%{opacity:0;transform:translateY(-16px);}100%{opacity:1;transform:translateY(0);}}
+.status-banner.ok{background:var(--green-light);border:1px solid rgba(46,125,50,0.3);}
+.status-banner.warn{background:var(--red-light);border:1px solid rgba(229,57,53,0.3);}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.status-dot.green{background:var(--green);}
+.status-dot.red{background:var(--red);}
+.status-banner-text{font-size:13px;font-weight:700;color:var(--text);}
+.status-banner-sub{font-size:11px;color:var(--text-sec);margin-top:2px;}
+.quick-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;}
+.qcard{
+  background:var(--card);border-radius:var(--radius-sm);
+  padding:10px 12px;box-shadow:var(--shadow);border:1px solid var(--border);
+  transition:all 0.3s ease;cursor:pointer;
+}
+.qcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.qcard:active{transform:translateY(0);}
+.qcard-label{font-size:9px;font-weight:700;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.8px;}
+.qcard-value{font-size:16px;font-weight:800;color:var(--text);margin-top:2px;}
+.qcard-sub{font-size:10px;color:var(--text-sec);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.qcard.danger .qcard-value{color:var(--red);}
+
+/* NEWS */
+.news-scroll{padding:0 16px;display:flex;flex-direction:column;gap:10px;}
+.news-card{
+  background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);
+  display:flex;gap:12px;padding:12px;box-shadow:var(--shadow);
+  cursor:pointer;transition:all 0.3s ease;animation:fadeInUp 0.4s ease-out backwards;
+}
+.news-card:nth-child(1){animation-delay:0.1s;}
+.news-card:nth-child(2){animation-delay:0.15s;}
+.news-card:nth-child(3){animation-delay:0.2s;}
+.news-card:hover{box-shadow:var(--shadow-lg);border-color:var(--blue);}
+.news-card:active{transform:scale(0.98);}
+.news-img{
+  width:52px;height:52px;border-radius:var(--radius-sm);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+}
+.news-body{flex:1;min-width:0;}
+.news-tag{
+  display:inline-block;padding:1px 8px;border-radius:10px;font-size:9px;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
+  background:var(--blue-light);color:var(--blue);margin-bottom:4px;
+}
+.news-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.news-meta{font-size:10px;color:var(--text-sec);margin-top:4px;font-weight:600;}
+.section-header-sm{
+  padding:16px 16px 8px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.section-title-sm{font-size:13px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.8px;}
+.see-all-sm{font-size:12px;color:var(--blue);font-weight:600;cursor:pointer;}
+.activity-row{
+  margin:0 16px;background:var(--card);border-radius:var(--radius-sm);
+  border:1px solid var(--border);overflow:hidden;
+}
+.act-item{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border-bottom:1px solid var(--border);cursor:pointer;
+  transition:all 0.2s ease;animation:fadeInUp 0.4s ease-out backwards;
+}
+@keyframes fadeInUp{0%{opacity:0;transform:translateY(8px);}100%{opacity:1;transform:translateY(0);}}
+.act-item:nth-child(1){animation-delay:0.05s;}
+.act-item:nth-child(2){animation-delay:0.1s;}
+.act-item:nth-child(3){animation-delay:0.15s;}
+.act-item:last-child{border-bottom:none;}
+.act-item:hover{background:var(--surface);}
+.act-item:active{background:var(--border);transform:scale(0.98);}
+.act-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.act-info{flex:1;}
+.act-title{font-size:13px;font-weight:700;color:var(--text);}
+.act-time{font-size:11px;color:var(--text-sec);margin-top:1px;}
+.act-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.badge-scan{background:var(--blue-light);color:var(--blue);}
+.badge-alert{background:var(--red-light);color:var(--red);}
+.badge-ok{background:var(--green-light);color:var(--green);}
+
+/* MY HEALTH */
+.health-hero{
+  background:linear-gradient(135deg,#2E7D32,#1B5E20);
+  padding:20px 20px 36px;flex-shrink:0;position:relative;overflow:hidden;
+}
+.health-hero::after{
+  content:'';position:absolute;bottom:-20px;left:-20px;right:-20px;
+  height:40px;background:var(--surface);border-radius:50% 50% 0 0;
+}
+.health-hero-name{color:#fff;font-size:18px;font-weight:800;}
+.health-hero-pid{color:rgba(255,255,255,0.6);font-size:12px;margin-top:2px;}
+.health-chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.health-chip{
+  padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;
+  background:rgba(255,255,255,0.15);color:#fff;
+}
+.health-chip.danger{background:rgba(229,57,53,0.8);}
+
+/* Updated by banner */
+.health-updated-banner{
+  margin:16px 16px 0;padding:12px 14px;
+  background:var(--blue-light);border:1px solid rgba(21,101,192,0.25);
+  border-radius:var(--radius-sm);display:flex;align-items:center;
+  justify-content:space-between;gap:10px;
+  animation:slideDown 0.4s ease-out;
+}
+.hub-left{display:flex;align-items:center;gap:8px;}
+.hub-icon{font-size:18px;flex-shrink:0;}
+.hub-text{font-size:12px;font-weight:700;color:var(--blue);}
+.hub-sub{font-size:11px;color:var(--text-sec);margin-top:1px;}
+.hub-history-btn{
+  font-size:11px;font-weight:700;color:var(--blue);
+  background:none;border:1.5px solid var(--blue);
+  border-radius:20px;padding:4px 10px;cursor:pointer;
+  font-family:var(--font);white-space:nowrap;transition:all 0.2s;
+  flex-shrink:0;
+}
+.hub-history-btn:hover{background:var(--blue);color:#fff;}
+
+.health-section{margin:12px 16px 0;}
+.health-card{
+  background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--border);overflow:hidden;
+  box-shadow:var(--shadow);margin-bottom:12px;
+  transition:all 0.3s ease;animation:slideInCard 0.5s ease-out backwards;
+}
+@keyframes slideInCard{0%{opacity:0;transform:translateX(-20px);}100%{opacity:1;transform:translateX(0);}}
+.health-section > .health-card:nth-child(1){animation-delay:0.1s;}
+.health-section > .health-card:nth-child(2){animation-delay:0.15s;}
+.health-section > .health-card:nth-child(3){animation-delay:0.2s;}
+.health-section > .health-card:nth-child(4){animation-delay:0.25s;}
+.health-section > .health-card:nth-child(5){animation-delay:0.3s;}
+.health-card:hover{box-shadow:var(--shadow-lg);border-color:var(--blue);}
+.health-card-header{
+  padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--border);background:var(--surface);
+}
+.health-card-title{font-size:13px;font-weight:700;color:var(--text);}
+.edit-btn{
+  font-size:12px;color:var(--blue);font-weight:700;cursor:pointer;
+  background:none;border:none;font-family:var(--font);
+}
+.health-card-body{padding:14px 16px;}
+.hrow{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:8px 0;border-bottom:1px solid var(--border);
+}
+.hrow:last-child{border-bottom:none;}
+.hrow-label{font-size:12px;color:var(--text-sec);font-weight:600;}
+.hrow-value{font-size:13px;font-weight:700;color:var(--text);text-align:right;max-width:60%;}
+.tag{
+  display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;
+  margin:2px;
+}
+.tag-red{background:var(--red-light);color:var(--red);}
+.tag-blue{background:var(--blue-light);color:var(--blue);}
+.tag-green{background:var(--green-light);color:var(--green);}
+.tag-orange{background:var(--orange-light);color:var(--orange);}
+.emergency-card{
+  background:var(--red-light);border:1px solid rgba(229,57,53,0.25);
+  border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;
+}
+.ec-name{font-size:14px;font-weight:700;color:var(--text);}
+.ec-rel{font-size:12px;color:var(--text-sec);margin-top:1px;}
+.ec-phone{font-size:13px;font-weight:700;color:var(--red);margin-top:6px;}
+
+/* Update History Modal content */
+.history-list{display:flex;flex-direction:column;gap:0;}
+.history-item{
+  display:flex;gap:12px;padding:12px 0;
+  border-bottom:1px solid var(--border);
+  animation:fadeInUp 0.3s ease-out backwards;
+}
+.history-item:last-child{border-bottom:none;}
+.history-item:nth-child(1){animation-delay:0.05s;}
+.history-item:nth-child(2){animation-delay:0.1s;}
+.history-item:nth-child(3){animation-delay:0.15s;}
+.history-item:nth-child(4){animation-delay:0.2s;}
+.history-item:nth-child(5){animation-delay:0.25s;}
+.history-dot{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--blue-light);display:flex;align-items:center;
+  justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px;
+}
+.history-info{flex:1;}
+.history-action{font-size:13px;font-weight:700;color:var(--text);}
+.history-by{font-size:12px;color:var(--blue);font-weight:600;margin-top:1px;}
+.history-date{font-size:11px;color:var(--text-sec);margin-top:2px;}
+
+/* CHATS SCREEN (Messenger Style) */
+.chats-header{
+  background:linear-gradient(135deg,#1565C0,#0D47A1);
+  padding:16px 20px 20px;flex-shrink:0;
+}
+.chats-header-top{display:flex;justify-content:space-between;align-items:center;}
+.chats-header-title{color:#fff;font-size:20px;font-weight:800;}
+.chats-header-sub{color:rgba(255,255,255,0.6);font-size:12px;margin-top:3px;}
+.chats-header-actions{display:flex;gap:12px;}
+.chats-action-btn{
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:rgba(255,255,255,0.15);color:#fff;font-size:16px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all 0.2s;
+}
+.chats-action-btn:hover{background:rgba(255,255,255,0.25);}
+.chats-action-btn:active{transform:scale(0.9);}
+.chats-search{
+  margin:12px 16px 8px;position:relative;
+}
+.chats-search-input{
+  width:100%;padding:10px 14px 10px 38px;border-radius:24px;
+  border:1.5px solid var(--border);background:var(--card);
+  color:var(--text);font-size:13px;font-family:var(--font);
+  outline:none;transition:border-color 0.2s;
+}
+.chats-search-input:focus{border-color:var(--blue);}
+.chats-search-input::placeholder{color:var(--text-sec);}
+.chats-search-icon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-size:14px;color:var(--text-sec);
+}
+.chat-item{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  cursor:pointer;transition:all 0.2s ease;
+  border-bottom:1px solid var(--border);
+  animation:fadeInUp 0.3s ease-out backwards;
+}
+.chat-item:nth-child(1){animation-delay:0.05s;}
+.chat-item:nth-child(2){animation-delay:0.1s;}
+.chat-item:nth-child(3){animation-delay:0.15s;}
+.chat-item:nth-child(4){animation-delay:0.2s;}
+.chat-item:nth-child(5){animation-delay:0.25s;}
+.chat-item:nth-child(6){animation-delay:0.3s;}
+.chat-item:hover{background:var(--surface);}
+.chat-item:active{background:var(--border);transform:scale(0.98);}
+.chat-avatar{
+  width:48px;height:48px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;position:relative;
+}
+.chat-avatar-online{
+  position:absolute;bottom:1px;right:1px;width:12px;height:12px;
+  border-radius:50%;background:var(--green);border:2px solid var(--card);
+}
+.chat-info{flex:1;min-width:0;}
+.chat-name{font-size:14px;font-weight:700;color:var(--text);}
+.chat-preview{font-size:12px;color:var(--text-sec);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.chat-time{font-size:11px;color:var(--text-sec);font-weight:600;}
+.chat-badge{
+  min-width:20px;height:20px;border-radius:10px;
+  background:var(--blue);color:#fff;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;padding:0 6px;
+}
+.chat-typing{color:var(--blue);font-style:italic;}
+.chats-section-label{
+  padding:10px 16px 6px;font-size:10px;font-weight:700;
+  color:var(--text-sec);text-transform:uppercase;letter-spacing:1px;
+}
+
+/* STORIES SCREEN (Recovery Stories Newsfeed) */
+.stories-header{
+  background:linear-gradient(135deg,#2E7D32,#1B5E20);
+  padding:16px 20px 20px;flex-shrink:0;
+}
+.stories-header-title{color:#fff;font-size:20px;font-weight:800;}
+.stories-header-sub{color:rgba(255,255,255,0.65);font-size:12px;margin-top:4px;}
+.stories-filter{
+  display:flex;gap:8px;padding:12px 16px;overflow-x:auto;
+  scrollbar-width:none;
+}
+.stories-filter::-webkit-scrollbar{display:none;}
+.filter-chip{
+  padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  background:var(--card);color:var(--text-sec);border:1.5px solid var(--border);
+  cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all 0.2s;
+}
+.filter-chip.active{background:var(--green-light);color:var(--green);border-color:var(--green);}
+.filter-chip:hover{border-color:var(--green);}
+.story-card{
+  margin:0 16px 14px;background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);
+  animation:fadeInUp 0.4s ease-out backwards;transition:all 0.3s ease;
+}
+.story-card:nth-child(1){animation-delay:0.05s;}
+.story-card:nth-child(2){animation-delay:0.1s;}
+.story-card:nth-child(3){animation-delay:0.15s;}
+.story-card:nth-child(4){animation-delay:0.2s;}
+.story-card:hover{box-shadow:var(--shadow-lg);border-color:var(--green);}
+.story-card-header{
+  display:flex;align-items:center;gap:10px;padding:14px 16px 0;
+}
+.story-avatar{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.story-author{flex:1;}
+.story-author-name{font-size:13px;font-weight:700;color:var(--text);}
+.story-author-info{font-size:11px;color:var(--text-sec);margin-top:1px;}
+.story-follow{
+  padding:4px 12px;border-radius:16px;font-size:11px;font-weight:700;
+  background:var(--green);color:#fff;border:none;cursor:pointer;
+  font-family:var(--font);transition:all 0.2s;
+}
+.story-follow:hover{opacity:0.9;}
+.story-follow:active{transform:scale(0.95);}
+.story-follow.following{background:var(--border);color:var(--text-sec);}
+.story-body{padding:10px 16px 0;}
+.story-text{font-size:13px;color:var(--text);line-height:1.6;}
+.story-text-see-more{color:var(--blue);font-weight:600;cursor:pointer;}
+.story-image{
+  margin:10px 16px 0;border-radius:var(--radius-sm);overflow:hidden;
+  height:180px;display:flex;align-items:center;justify-content:center;
+  font-size:48px;
+}
+.story-footer{
+  display:flex;align-items:center;gap:16px;padding:10px 16px 14px;
+}
+.story-react{
+  display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-sec);
+  cursor:pointer;transition:all 0.2s;font-weight:600;
+}
+.story-react:hover{color:var(--red);}
+.story-react.liked{color:var(--red);}
+.story-react-icon{font-size:16px;}
+.story-comment{font-size:12px;color:var(--text-sec);font-weight:600;cursor:pointer;}
+.story-comment:hover{color:var(--blue);}
+.story-share{font-size:12px;color:var(--text-sec);font-weight:600;cursor:pointer;}
+.story-share:hover{color:var(--green);}
+
+/* SETTINGS SCREEN */
+.settings-hero{
+  background:linear-gradient(135deg,#1565C0,#0A1628);
+  padding:24px 20px;flex-shrink:0;text-align:center;position:relative;
+}
+.settings-avi{font-size:52px;margin-bottom:8px;}
+.settings-name{color:#fff;font-size:18px;font-weight:800;}
+.settings-pid{color:rgba(255,255,255,0.6);font-size:12px;margin-top:2px;}
+.settings-section{margin:16px 16px 0;}
+.settings-section-title{font-size:11px;font-weight:700;color:var(--text-sec);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.settings-group{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);}
+.settings-row{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.2s;
+}
+.settings-row:last-child{border-bottom:none;}
+.settings-row:hover{background:var(--surface);}
+.settings-row:active{background:var(--border);}
+.settings-row-icon{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.settings-row-info{flex:1;min-width:0;}
+.settings-row-label{font-size:13px;font-weight:700;color:var(--text);}
+.settings-row-value{font-size:11px;color:var(--text-sec);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.settings-row-action{font-size:18px;color:var(--text-sec);}
+.logout-btn{
+  display:block;width:calc(100% - 32px);margin:16px 16px 24px;
+  padding:14px;background:var(--red-light);color:var(--red);
+  border:1.5px solid rgba(229,57,53,0.3);border-radius:var(--radius);
+  font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);
+  transition:all 0.2s;
+}
+.logout-btn:hover{background:var(--red);color:#fff;}
+.logout-btn:active{transform:scale(0.97);}
+.toggle-wrap{flex-shrink:0;}
+.toggle{position:relative;display:inline-block;width:44px;height:24px;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{
+  position:absolute;cursor:pointer;inset:0;border-radius:12px;
+  background:var(--border);transition:background 0.3s;
+}
+.toggle-track::before{
+  content:'';position:absolute;height:18px;width:18px;
+  left:3px;top:3px;border-radius:50%;background:#fff;
+  transition:transform 0.3s;box-shadow:0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle input:checked + .toggle-track{background:var(--blue);}
+.toggle input:checked + .toggle-track::before{transform:translateX(20px);}
+
+/* SPINNER */
+.spinner{
+  display:inline-block;width:16px;height:16px;border-radius:50%;
+  border:2px solid var(--border);border-top-color:var(--blue);
+  animation:spin 0.9s linear infinite;flex-shrink:0;
+}
+
+/* MODAL */
+.modal-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,0.55);
+  z-index:700;display:none;flex-direction:column;justify-content:flex-end;
+  backdrop-filter:blur(2px);
+}
+.modal-overlay.open{display:flex;}
+.modal-sheet{
+  background:var(--card);border-radius:24px 24px 0 0;
+  padding:0 20px 24px;max-height:85vh;overflow-y:auto;
+  animation:slideUpModal 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideUpModal{0%{transform:translateY(100%);}100%{transform:translateY(0);}}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 16px;}
+.modal-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;}
+.modal-input-group{margin-bottom:12px;}
+.modal-input-group label{display:block;font-size:11px;font-weight:700;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;}
+.modal-input{
+  width:100%;padding:11px 14px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);background:var(--surface);
+  color:var(--text);font-size:14px;font-family:var(--font);outline:none;
+  transition:border-color 0.2s;
+}
+.modal-input:focus{border-color:var(--blue);}
+.modal-pass-wrap{position:relative;}
+.modal-pass-wrap .modal-input{padding-right:42px;}
+.modal-eye-btn{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:16px;
+  color:var(--text-sec);padding:4px;
+}
+.modal-error{
+  color:var(--red);font-size:12px;font-weight:600;
+  margin-bottom:10px;display:none;
+  background:var(--red-light);padding:8px 12px;border-radius:var(--radius-sm);
+}
+.modal-divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
+.modal-save{
+  width:100%;padding:13px;background:var(--blue);color:#fff;border:none;
+  border-radius:var(--radius);font-size:14px;font-weight:700;
+  cursor:pointer;font-family:var(--font);margin-bottom:8px;transition:all 0.2s;
+}
+.modal-save:hover{background:var(--blue-dark);}
+.modal-save:active{transform:scale(0.97);}
+.modal-cancel{
+  width:100%;padding:12px;background:none;color:var(--text-sec);border:none;
+  font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);
+}
+
+/* INFO MODAL */
+.info-modal-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,0.6);
+  z-index:800;display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);padding:20px;
+}
+.info-modal-overlay.open{display:flex;}
+.info-modal-box{
+  background:var(--card);border-radius:var(--radius);
+  padding:28px 24px;width:100%;max-width:320px;text-align:center;
+  animation:bounce 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow:var(--shadow-lg);
+}
+@keyframes bounce{0%{transform:scale(0.5);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.info-modal-icon{font-size:44px;margin-bottom:12px;}
+.info-modal-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.info-modal-body{font-size:13px;color:var(--text-sec);line-height:1.6;margin-bottom:20px;}
+.info-modal-body a{color:var(--blue);}
+.info-modal-btn{
+  width:100%;padding:13px;background:var(--blue);color:#fff;border:none;
+  border-radius:var(--radius);font-size:14px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:all 0.2s;
+}
+.info-modal-btn.danger{background:var(--red);}
+.info-modal-btn:hover{opacity:0.9;}
+
+/* TOAST */
+.toast{
+  position:absolute;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1A1A2E;color:#fff;padding:10px 20px;
+  border-radius:24px;font-size:13px;font-weight:600;
+  opacity:0;transition:all 0.3s;pointer-events:none;
+  white-space:nowrap;z-index:9999;max-width:90%;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:absolute;bottom:0;left:0;right:0;height:72px;
+  background:var(--card);border-top:1px solid var(--border);
+  display:none;align-items:center;justify-content:space-around;
+  padding:0 4px 8px;z-index:100;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.08);
+}
+.bottom-nav.visible{display:flex;}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;cursor:pointer;padding:6px 12px;
+  flex:1;position:relative;transition:all 0.2s;
+}
+.nav-item.active .nav-icon,.nav-item.active .nav-text{color:var(--blue);}
+.nav-icon{font-size:20px;color:var(--text-sec);transition:color 0.2s;}
+.nav-text{font-size:10px;font-weight:600;color:var(--text-sec);transition:color 0.2s;}
+.nav-dot{
+  position:absolute;top:4px;width:5px;height:5px;border-radius:50%;
+  background:var(--blue);display:none;
+}
+.nav-item.active .nav-dot{display:block;}
+.nav-scan-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;cursor:pointer;padding:0 12px;flex:1;
+}
+.nav-scan-circle{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,#2E7D32,#1B5E20);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 4px 16px rgba(46,125,50,0.4);
+  margin-top:-18px;border:3px solid var(--card);transition:all 0.2s;
+}
+.nav-scan-circle:hover{transform:scale(1.05);}
+.nav-scan-text{font-size:10px;font-weight:600;color:var(--text-sec);margin-top:2px;}
+
+/* SCAN SCREEN */
+.scan-header{
+  background:linear-gradient(135deg,#1565C0,#0D47A1);
+  padding:16px 20px 20px;flex-shrink:0;
+}
+.scan-header-title{color:#fff;font-size:20px;font-weight:800;}
+.scan-header-sub{color:rgba(255,255,255,0.65);font-size:12px;margin-top:4px;}
+.scan-qr-card{
+  margin:16px 16px 12px;background:var(--card);border-radius:var(--radius);
+  padding:24px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);
+}
+.scan-qr-icon{font-size:64px;margin-bottom:12px;animation:iconPulse 2s ease-in-out infinite;}
+@keyframes iconPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+.scan-qr-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.scan-qr-sub{font-size:13px;color:var(--text-sec);line-height:1.5;margin-bottom:16px;}
+.scan-btn{
+  display:inline-flex;align-items:center;gap:8px;padding:13px 24px;
+  background:var(--blue);color:#fff;border:none;border-radius:var(--radius);
+  font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);
+  transition:all 0.2s;
+}
+.scan-btn:hover{background:var(--blue-dark);}
+.scan-btn:active{transform:scale(0.97);}
+.scan-history-card{
+  margin:0 16px 12px;background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);
+}
+
+/* CAMERA OVERLAY */
+.camera-overlay{
+  position:absolute;inset:0;background:#000;
+  z-index:750;display:none;flex-direction:column;
+}
+.camera-overlay.open{display:flex;}
+.camera-top-bar{
+  padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
+  background:rgba(0,0,0,0.7);z-index:1;
+}
+.camera-title{color:#fff;font-size:15px;font-weight:700;}
+.camera-close-btn{
+  background:rgba(255,255,255,0.15);border:none;border-radius:50%;
+  width:32px;height:32px;color:#fff;font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.camera-close-btn:hover{background:rgba(255,255,255,0.3);}
+.camera-video{flex:1;width:100%;object-fit:cover;background:#000;}
+.camera-frame{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);
+  width:220px;height:220px;
+}
+.camera-frame-corner{
+  position:absolute;width:32px;height:32px;
+  border-color:#fff;border-style:solid;border-width:0;
+}
+.camera-frame-corner.tl{top:0;left:0;border-top-width:4px;border-left-width:4px;border-top-left-radius:4px;}
+.camera-frame-corner.tr{top:0;right:0;border-top-width:4px;border-right-width:4px;border-top-right-radius:4px;}
+.camera-frame-corner.bl{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px;border-bottom-left-radius:4px;}
+.camera-frame-corner.br{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px;border-bottom-right-radius:4px;}
+.camera-scan-line{
+  position:absolute;top:0;left:4px;right:4px;height:2px;
+  background:linear-gradient(to right,transparent,#1565C0,transparent);
+  animation:scanLine 2s linear infinite;
+}
+@keyframes scanLine{0%{top:4px;}100%{top:calc(100% - 6px);}}
+.camera-bottom-bar{
+  padding:20px 16px;background:rgba(0,0,0,0.7);text-align:center;
+}
+.camera-hint{color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;}
+.camera-denied{
+  background:rgba(0,0,0,0.8);border-radius:var(--radius);
+  padding:28px;text-align:center;margin:20px;
+}
+.camera-denied-icon{font-size:48px;margin-bottom:12px;}
+.camera-denied-title{color:#fff;font-size:16px;font-weight:800;margin-bottom:8px;}
+.camera-denied-msg{color:rgba(255,255,255,0.65);font-size:13px;line-height:1.6;margin-bottom:16px;}
+.camera-denied-btn{
+  padding:12px 24px;background:#fff;color:#0A1628;border:none;
+  border-radius:var(--radius);font-size:14px;font-weight:700;
+  cursor:pointer;font-family:var(--font);
+}
+
+/* LIFECARD+ OVERLAY */
+.lc-overlay{
+  position:absolute;inset:0;background:#0A1628;
+  z-index:760;display:none;flex-direction:column;
+  animation:screenEnter 0.35s ease-out forwards;
+}
+.lc-overlay.open{display:flex;}
+.dc-topbar{
+  background:#0C2D40;padding:12px 16px 10px;flex-shrink:0;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.dc-back-btn{
+  width:32px;height:32px;border-radius:50%;border:none;
+  background:rgba(255,255,255,0.15);color:#fff;
+  font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font);line-height:1;flex-shrink:0;
+}
+.dc-back-btn:hover{background:rgba(255,255,255,0.25);}
+.dc-topbar-title{color:#fff;font-size:16px;font-weight:800;}
+.lc-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.lc-scroll::-webkit-scrollbar{display:none;}
+.lc-hero{
+  padding:24px 20px;text-align:center;
+  background:linear-gradient(160deg,#0D2235,#0A3A4A);
+}
+.lc-badge{
+  display:inline-block;padding:4px 14px;border-radius:20px;
+  background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);
+  font-size:11px;font-weight:700;letter-spacing:0.5px;margin-bottom:10px;
+}
+.lc-title{color:#fff;font-size:26px;font-weight:900;margin-bottom:8px;}
+.lc-subtitle{color:rgba(255,255,255,0.6);font-size:13px;line-height:1.6;margin-bottom:20px;}
+.lc-bracelet-wrap{display:flex;justify-content:center;}
+.lc-bracelet{
+  width:100px;height:100px;border-radius:50%;
+  background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+}
+.lc-bracelet-icon{font-size:36px;}
+.lc-bracelet-label{font-size:10px;color:rgba(255,255,255,0.6);font-weight:700;}
+.lc-body{padding:20px;}
+.lc-how-title{font-size:14px;font-weight:800;color:#fff;margin-bottom:12px;}
+.lc-step{
+  display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;
+}
+.lc-step-num{
+  width:24px;height:24px;border-radius:50%;background:var(--blue);
+  color:#fff;font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.lc-step-text{color:rgba(255,255,255,0.75);font-size:13px;line-height:1.5;}
+.lc-cta-box{
+  margin:0 20px 24px;padding:20px;
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);
+  border-radius:var(--radius);text-align:center;
+}
+.lc-price{color:#fff;font-size:28px;font-weight:900;margin-bottom:4px;}
+.lc-price-label{color:rgba(255,255,255,0.5);font-size:12px;margin-bottom:16px;}
+.lc-order-btn{
+  width:100%;padding:14px;background:#fff;color:#0A1628;
+  border:none;border-radius:var(--radius);font-size:14px;font-weight:800;
+  cursor:pointer;font-family:var(--font);transition:all 0.2s;
+}
+.lc-order-btn:hover{opacity:0.9;}
+.lc-order-btn:active{transform:scale(0.97);}
+.lc-note{color:rgba(255,255,255,0.35);font-size:11px;margin-top:10px;}
+
+/* ORDER FLOW */
+.order-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,0.6);
+  z-index:780;display:none;flex-direction:column;justify-content:flex-end;
+  backdrop-filter:blur(2px);
+}
+.order-overlay.open{display:flex;}
+.order-sheet{
+  background:var(--card);border-radius:24px 24px 0 0;
+  padding:0 20px 28px;max-height:90vh;overflow-y:auto;
+  animation:slideUpModal 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.order-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 16px;}
+.order-steps{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:20px;}
+.order-step-dot{
+  width:28px;height:28px;border-radius:50%;background:var(--border);
+  color:var(--text-sec);font-size:12px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;transition:all 0.3s;
+}
+.order-step-dot.active{background:var(--blue);color:#fff;}
+.order-step-dot.done{background:var(--green);color:#fff;}
+.order-step-line{flex:1;height:2px;background:var(--border);transition:background 0.3s;max-width:40px;}
+.order-step-line.done{background:var(--green);}
+.order-step-panel{display:none;}
+.order-step-panel.active{display:block;}
+.order-panel-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.order-panel-sub{font-size:13px;color:var(--text-sec);margin-bottom:16px;}
+.payment-options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.payment-option{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;
+  background:var(--surface);border-radius:var(--radius-sm);
+  border:2px solid var(--border);cursor:pointer;transition:all 0.2s;
+}
+.payment-option.selected{border-color:var(--blue);background:var(--blue-light);}
+.payment-option:hover{border-color:var(--blue);}
+.payment-option-icon{font-size:28px;flex-shrink:0;}
+.payment-option-label{font-size:14px;font-weight:700;color:var(--text);}
+.payment-option-sub{font-size:12px;color:var(--text-sec);margin-top:1px;}
+.payment-check{
+  margin-left:auto;font-size:16px;font-weight:800;color:var(--blue);
+  width:20px;text-align:center;flex-shrink:0;
+}
+.proof-upload-area{
+  border:2px dashed var(--border);border-radius:var(--radius-sm);
+  padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;
+  margin-bottom:16px;background:var(--surface);
+}
+.proof-upload-area:hover{border-color:var(--blue);background:var(--blue-light);}
+.proof-upload-area.has-file{border-color:var(--green);background:var(--green-light);}
+.proof-upload-icon{font-size:32px;margin-bottom:8px;}
+.proof-upload-label{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.proof-upload-sub{font-size:12px;color:var(--text-sec);}
+.proof-file-input{display:none;}
+.order-summary-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;
+}
+.order-summary-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;}
+.order-summary-label{color:var(--text-sec);font-weight:600;}
+.order-summary-val{color:var(--text);font-weight:700;}
+.order-summary-total{border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-size:14px;}
+.order-btn-primary{
+  width:100%;padding:14px;background:var(--blue);color:#fff;border:none;
+  border-radius:var(--radius);font-size:14px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:all 0.2s;
+}
+.order-btn-primary:hover{background:var(--blue-dark);}
+.order-btn-primary:active{transform:scale(0.97);}
+.order-btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+.order-btn-secondary{
+  width:100%;padding:12px;background:none;color:var(--text-sec);border:none;
+  font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-top:8px;
+}
+.order-success-wrap{text-align:center;padding:16px 0;}
+.order-success-icon{font-size:56px;margin-bottom:12px;animation:bounce 0.6s ease;}
+.order-success-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.order-success-msg{font-size:13px;color:var(--text-sec);line-height:1.7;margin-bottom:20px;}
+.order-success-close{
+  width:100%;padding:14px;background:var(--green);color:#fff;border:none;
+  border-radius:var(--radius);font-size:14px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:all 0.2s;
+}
+.order-success-close:hover{opacity:0.9;}
+
+/* HIDE REPLIT BADGE */
+#replit-badge,[data-replit-badge],.replit-badge{display:none!important;}
+
+/* AUTH LOADING OVERLAY */
+.auth-load-overlay{
+  position:absolute;inset:0;z-index:9999;
+  background:linear-gradient(160deg,#0A1628 0%,#1565C0 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+}
+.auth-load-overlay.visible{display:flex;}
+.auth-load-spinner{
+  width:60px;height:60px;border-radius:50%;
+  border:4px solid rgba(255,255,255,0.2);
+  border-top-color:#fff;
+  animation:spin 0.9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.auth-load-icon{font-size:48px;animation:iconPulse 1.2s ease-in-out infinite;}
+.auth-load-text{color:#fff;font-size:18px;font-weight:800;letter-spacing:-0.3px;}
+.auth-load-sub{color:rgba(255,255,255,0.55);font-size:13px;font-weight:600;}
+
+/* ACTIVITY LOG SCREEN */
+.actlog-header{
+  background:linear-gradient(135deg,#1565C0,#0A1628);
+  padding:16px 20px 20px;flex-shrink:0;
+}
+.actlog-header-title{color:#fff;font-size:20px;font-weight:800;}
+.actlog-header-sub{color:rgba(255,255,255,0.65);font-size:12px;margin-top:4px;}
+.actlog-filter-row{
+  display:flex;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;
+}
+.actlog-filter-row::-webkit-scrollbar{display:none;}
+.actlog-chip{
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  background:var(--card);color:var(--text-sec);border:1.5px solid var(--border);
+  cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all 0.2s;flex-shrink:0;
+}
+.actlog-chip.active{background:var(--blue-light);color:var(--blue);border-color:var(--blue);}
+.actlog-list{margin:0 16px;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);}
+.actlog-item{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 14px;
+  border-bottom:1px solid var(--border);
+  animation:fadeInUp 0.35s ease-out backwards;
+}
+.actlog-item:last-child{border-bottom:none;}
+.actlog-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;margin-top:1px;}
+.actlog-info{flex:1;min-width:0;}
+.actlog-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;}
+.actlog-meta{font-size:11px;color:var(--text-sec);margin-top:3px;}
+.actlog-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.actlog-empty{padding:40px 20px;text-align:center;color:var(--text-sec);font-size:13px;}
+.actlog-empty-icon{font-size:40px;margin-bottom:10px;}
+.actlog-loading{padding:28px;text-align:center;color:var(--text-sec);font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.actlog-section-label{padding:14px 16px 6px;font-size:11px;font-weight:700;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.8px;}
+.actlog-alert-card{
+  margin:0 16px 10px;padding:13px 14px;border-radius:var(--radius-sm);
+  display:flex;align-items:flex-start;gap:12px;border:1px solid var(--border);
+  background:var(--card);box-shadow:var(--shadow);
+  animation:fadeInUp 0.35s ease-out backwards;
+}
+.actlog-alert-icon{font-size:22px;flex-shrink:0;margin-top:1px;}
+.actlog-alert-info{flex:1;}
+.actlog-alert-title{font-size:13px;font-weight:700;color:var(--text);}
+.actlog-alert-desc{font-size:12px;color:var(--text-sec);margin-top:3px;line-height:1.5;}
+.actlog-alert-time{font-size:10px;color:var(--text-sec);margin-top:4px;font-weight:600;}
+
+/* ORDER STATUS SECTION */
+.order-status-card{
+  background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);
+  padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+  animation:fadeInUp 0.35s ease-out backwards;
+}
+.osc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.osc-type{font-size:13px;font-weight:800;color:var(--text);}
+.osc-status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.osc-status.pending{background:var(--orange-light);color:var(--orange);}
+.osc-status.approved{background:var(--green-light);color:var(--green);}
+.osc-status.processing{background:var(--blue-light);color:var(--blue);}
+.osc-status.rejected{background:var(--red-light);color:var(--red);}
+.osc-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;}
+.osc-label{color:var(--text-sec);font-weight:600;}
+.osc-val{color:var(--text);font-weight:700;}
+.osc-empty{padding:20px;text-align:center;color:var(--text-sec);font-size:13px;}
+.osc-loading{padding:16px;text-align:center;color:var(--text-sec);font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.osc-card{
+  background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);
+  padding:14px 16px;margin:0 0 10px;box-shadow:var(--shadow);
+  animation:fadeInUp 0.35s ease-out backwards;
+}
+.osc-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.osc-card-type{font-size:13px;font-weight:800;color:var(--text);}
+.osc-card-status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--blue-light);}
+.osc-card-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:var(--text);}
+.osc-card-actions{display:flex;gap:8px;margin-top:10px;}
+.osc-btn-received{
+  flex:1;padding:9px 10px;background:var(--green);color:#fff;border:none;
+  border-radius:var(--radius-sm);font-size:12px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:all 0.2s;
+}
+.osc-btn-received:hover{opacity:0.9;}
+.osc-btn-received:active{transform:scale(0.97);}
+.osc-btn-received:disabled{opacity:0.5;cursor:not-allowed;}
+.osc-btn-complain{
+  flex:1;padding:9px 10px;background:var(--red-light);color:var(--red);
+  border:1.5px solid rgba(229,57,53,0.3);
+  border-radius:var(--radius-sm);font-size:12px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:all 0.2s;
+}
+.osc-btn-complain:hover{background:var(--red);color:#fff;}
+.osc-btn-complain:active{transform:scale(0.97);}
+.actlog-card{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 14px;
+  border-bottom:1px solid var(--border);
+  animation:fadeInUp 0.35s ease-out backwards;
+}
+.actlog-card:last-child{border-bottom:none;}
+.actlog-card.alert-card{
+  margin:0 16px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--card);box-shadow:var(--shadow);
+}
+.actlog-card-icon{font-size:22px;flex-shrink:0;margin-top:1px;width:32px;text-align:center;}
+.actlog-card-body{flex:1;min-width:0;}
+.actlog-card-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;}
+.actlog-card-sub{font-size:12px;color:var(--text-sec);margin-top:3px;line-height:1.45;}
+.actlog-card-date{font-size:10px;color:var(--text-sec);margin-top:4px;font-weight:600;}
+
+.home-viewcard-wrap{padding:0 16px;margin-top:8px;}
+.home-viewcard-btn{
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,#0D4F4F 0%,#0A3A4A 60%,#0A1F3C 100%);
+  border-radius:var(--radius-sm);padding:14px 16px;
+  cursor:pointer;border:none;width:100%;
+  font-family:var(--font);transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(0,0,0,0.25);
+}
+.home-viewcard-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,0.35);}
+.home-viewcard-btn:active{transform:scale(0.98);}
+.home-viewcard-icon{font-size:30px;flex-shrink:0;}
+.home-viewcard-text{text-align:left;flex:1;}
+.home-viewcard-title{color:#fff;font-size:14px;font-weight:800;}
+.home-viewcard-sub{color:rgba(255,255,255,0.5);font-size:11px;margin-top:2px;}
+.home-viewcard-arrow{color:rgba(255,255,255,0.35);font-size:20px;flex-shrink:0;}
+
+/* PATIENT TIMELINE */
+.timeline-wrap{margin:0 16px 12px;}
+.timeline-item-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.timeline-item-row:last-child{border-bottom:none;}
+.tl-dot-col{display:flex;flex-direction:column;align-items:center;gap:0;width:20px;flex-shrink:0;padding-top:3px;}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0;box-shadow:0 0 0 3px var(--blue-light);}
+.tl-line{width:2px;flex:1;background:var(--border);min-height:16px;margin-top:4px;}
+.tl-content{flex:1;}
+.tl-hospital{font-size:12px;font-weight:800;color:var(--blue);margin-bottom:2px;}
+.tl-date{font-size:10px;color:var(--text-sec);margin-bottom:4px;}
+.tl-tag{display:inline-block;padding:1px 8px;border-radius:12px;font-size:10px;font-weight:700;}
+.tl-tag.diag{background:var(--orange-light);color:var(--orange);}
+.tl-tag.treat{background:var(--blue-light);color:var(--blue);}
+.tl-tag.cond{background:var(--red-light);color:var(--red);}
+.tl-tag.meds{background:var(--green-light);color:var(--green);}
+.tl-field-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.tl-detail{font-size:11px;color:var(--text-sec);line-height:1.5;margin-top:2px;}
+.tl-by{font-size:10px;color:var(--text-sec);margin-top:4px;font-style:italic;}
+.tl-empty{padding:24px;text-align:center;color:var(--text-sec);font-size:13px;}
+.tl-loading{padding:20px;text-align:center;color:var(--text-sec);font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;}
+
+/* VIRTUAL LIFECARD OVERLAY */
+.vlc-overlay{
+  position:absolute;inset:0;background:#0A1628;
+  z-index:760;display:none;flex-direction:column;
+  animation:screenEnter 0.35s ease-out forwards;
+}
+.vlc-overlay.open{display:flex;}
+.vlc-topbar{
+  background:#0C2D40;padding:12px 16px 10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.vlc-topbar-left{display:flex;align-items:center;gap:8px;}
+.vlc-topbar-title{color:#fff;font-size:16px;font-weight:800;}
+.vlc-close-btn{
+  width:32px;height:32px;border-radius:50%;border:none;
+  background:rgba(255,255,255,0.15);color:#fff;
+  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font);line-height:1;
+}
+.vlc-close-btn:hover{background:rgba(255,255,255,0.25);}
+.vlc-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:16px 16px 24px;}
+.vlc-scroll::-webkit-scrollbar{display:none;}
+
+/* 3D FLIP SCENE */
+.vlc-card-scene{
+  width:100%;height:260px;perspective:1000px;cursor:pointer;margin-bottom:12px;
+}
+.vlc-card-inner{
+  position:relative;width:100%;height:100%;
+  transform-style:preserve-3d;
+  transition:transform 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.vlc-card-scene.flipped .vlc-card-inner{transform:rotateY(180deg);}
+.vlc-card-face,
+.vlc-card-back-face{
+  position:absolute;inset:0;border-radius:16px;overflow:hidden;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+.vlc-card-back-face{transform:rotateY(180deg);}
+
+/* FRONT FACE */
+.vlc-front-face{
+  background:#fff;display:flex;flex-direction:column;
+}
+.vlc-front-header{
+  background:linear-gradient(135deg,#0C5F6E 0%,#0A3A42 100%);
+  padding:12px 14px 10px;
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.vlc-photo-circle{
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;color:#fff;letter-spacing:-1px;
+}
+.vlc-front-meta{flex:1;min-width:0;}
+.vlc-front-name{color:#fff;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vlc-front-lcid{color:rgba(255,255,255,0.7);font-size:9px;font-weight:700;margin-top:2px;letter-spacing:0.5px;}
+.vlc-front-pid{color:rgba(255,255,255,0.5);font-size:8px;margin-top:1px;}
+.vlc-blood-badge{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:#c0392b;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:10px;font-weight:900;text-align:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);
+}
+.vlc-front-body{display:flex;flex:1;min-height:0;}
+.vlc-front-fields{flex:1;padding:10px 12px;display:flex;flex-direction:column;justify-content:space-around;overflow:hidden;}
+.vlc-ffield{margin-bottom:6px;}
+.vlc-ffield:last-child{margin-bottom:0;}
+.vlc-ffield-label{color:#9CA3AF;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px;}
+.vlc-ffield-val{color:#111;font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vlc-allergy-chip{
+  display:inline-block;padding:1px 7px;border-radius:20px;
+  background:#FEE2E2;color:#DC2626;
+  font-size:9px;font-weight:800;margin-right:3px;
+  border:1px solid #FECACA;
+}
+.vlc-qr-panel{
+  width:88px;flex-shrink:0;
+  background:#0C5F6E;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  padding:8px 6px;
+}
+.vlc-qr-label-top{color:rgba(255,255,255,0.7);font-size:7px;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:0.5px;line-height:1.3;}
+.vlc-qr-img{
+  width:66px;height:66px;border-radius:5px;overflow:hidden;
+  background:#fff;border:1px solid rgba(255,255,255,0.3);
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+}
+.vlc-qr-img img{width:100%;height:100%;object-fit:cover;}
+.vlc-qr-secure-line{color:rgba(255,255,255,0.5);font-size:7px;text-align:center;line-height:1.4;}
+.vlc-front-footer{
+  background:#0D1B2A;padding:7px 14px;flex-shrink:0;text-align:center;
+  color:rgba(255,255,255,0.6);font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+}
+
+/* BACK FACE */
+.vlc-back-face{
+  background:#fff;display:flex;flex-direction:column;
+}
+.vlc-back-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:10px 14px 6px;gap:8px;flex-shrink:0;
+}
+.vlc-alert-header-left{display:flex;align-items:flex-start;gap:8px;}
+.vlc-alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.vlc-alert-title{font-size:14px;font-weight:900;color:#DC2626;line-height:1;}
+.vlc-alert-sub{font-size:9px;color:#6B7280;font-weight:600;margin-top:3px;}
+.vlc-responder-badge{
+  padding:4px 7px;background:#FFF7ED;color:#C2410C;
+  border:1px solid #FED7AA;border-radius:6px;
+  font-size:8px;font-weight:700;white-space:nowrap;flex-shrink:0;
+}
+.vlc-allergy-banner{
+  margin:0 14px 8px;padding:6px 12px;
+  background:#DC2626;border-radius:6px;
+  color:#fff;font-size:10px;font-weight:800;letter-spacing:0.3px;flex-shrink:0;
+}
+.vlc-alert-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  border-top:1px solid #F3F4F6;border-left:1px solid #F3F4F6;
+  margin:0 14px 8px;border-radius:6px;overflow:hidden;flex-shrink:0;
+}
+.vlc-agcell{padding:7px 10px;border-bottom:1px solid #F3F4F6;border-right:1px solid #F3F4F6;}
+.vlc-agcell-icon{font-size:11px;margin-bottom:2px;}
+.vlc-agcell-label{font-size:7px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.8px;}
+.vlc-agcell-val{font-size:14px;font-weight:900;color:#111;margin-top:1px;}
+.vlc-agcell-val.sm{font-size:11px;}
+.vlc-ec-row{
+  margin:0 14px 0;padding:7px 12px;
+  background:#F9FAFB;border-radius:8px;border:1px solid #F3F4F6;
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.vlc-ec-icon{font-size:15px;flex-shrink:0;}
+.vlc-ec-text{font-size:11px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vlc-back-footer{
+  padding:7px 14px;
+  background:#0C5F6E;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;margin-top:auto;
+}
+.vlc-back-footer-left{font-size:8px;color:rgba(255,255,255,0.7);font-weight:700;}
+.vlc-back-footer-right{font-size:8px;color:rgba(255,255,255,0.7);font-weight:700;}
+.vlc-flip-hint{
+  text-align:center;color:rgba(255,255,255,0.5);
+  font-size:11px;font-weight:600;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.vlc-flip-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:12px;border-radius:var(--radius);
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  color:#fff;font-size:13px;font-weight:800;
+  cursor:pointer;font-family:var(--font);transition:all 0.2s;margin-bottom:10px;
+}
+.vlc-flip-btn:hover{background:rgba(255,255,255,0.18);}
+.vlc-flip-btn:active{transform:scale(0.97);}
+.vlc-download-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin:0;padding:14px;border-radius:var(--radius);
+  background:linear-gradient(135deg,#0C5F6E,#0A3A42);
+  color:#fff;border:none;font-size:14px;font-weight:800;
+  cursor:pointer;font-family:var(--font);
+  box-shadow:0 4px 20px rgba(12,95,110,0.4);transition:all 0.2s;
+  width:100%;
+}
+.vlc-download-btn:hover{opacity:0.9;}
+.vlc-download-btn:active{transform:scale(0.97);}
+.vlc-card-note{
+  padding:8px 0 0;text-align:center;
+  color:rgba(255,255,255,0.4);font-size:10px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+
+/* Settings Inline ActivityLog */
+.settings-actlog-wrap{
+  background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);
+}
+.settings-actlog-item{
+  display:flex;align-items:flex-start;gap:10px;padding:11px 14px;
+  border-bottom:1px solid var(--border);
+  animation:fadeInUp 0.3s ease-out backwards;
+}
+.settings-actlog-item:last-child{border-bottom:none;}
+.settings-actlog-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.settings-actlog-body{flex:1;min-width:0;}
+.settings-actlog-title{font-size:12px;font-weight:700;color:var(--text);line-height:1.3;}
+.settings-actlog-date{font-size:10px;color:var(--text-sec);margin-top:2px;}
+.settings-actlog-loading{padding:20px;text-align:center;color:var(--text-sec);font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.settings-actlog-empty{padding:20px;text-align:center;color:var(--text-sec);font-size:12px;}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- AUTH LOADING OVERLAY -->
+  <div class="auth-load-overlay" id="auth-load-overlay">
+    <div class="auth-load-icon" id="auth-load-icon">🩺</div>
+    <div class="auth-load-spinner"></div>
+    <div class="auth-load-text" id="auth-load-text">Signing In…</div>
+    <div class="auth-load-sub" id="auth-load-sub">Please wait a moment</div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div class="screen active" id="login">
+    <div class="scroll-content">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🩺</div>
+        <div class="auth-logo-title">LifeCard Patient</div>
+        <div class="auth-logo-sub">Your health profile, always ready</div>
+      </div>
+      <div class="auth-form">
+        <div class="auth-input-group">
+          <label>Username</label>
+          <input type="text" id="login-email" placeholder="Enter your username" autocomplete="username"/>
+        </div>
+        <div class="auth-input-group">
+          <label>Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="login-pass" placeholder="Enter your password" autocomplete="current-password"/>
+            <button class="eye-btn" type="button" onclick="togglePw('login-pass',this)">👁️</button>
+          </div>
+        </div>
+        <div class="auth-error" id="login-error">❌ Invalid username or password.</div>
+        <button class="btn-auth" id="login-btn" onclick="doLogin()">Sign In</button>
+        <div class="auth-switch">Don't have an account? <span onclick="switchScreen('register','login')">Register here</span></div>
+      </div>
+      <div class="auth-footer"><p>LifeCard Patient v1.0 · HIPAA Compliant · 🔒 Encrypted</p></div>
+    </div>
+  </div>
+
+  <!-- REGISTER SCREEN -->
+  <div class="screen" id="register">
+    <div class="scroll-content">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">✍️</div>
+        <div class="auth-logo-title">Create Account</div>
+        <div class="auth-logo-sub">Set up your health profile</div>
+      </div>
+      <div class="auth-form">
+        <div class="auth-input-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="Maria Santos"/>
+        </div>
+        <div class="auth-input-group">
+          <label>Email Address</label>
+          <input type="email" id="reg-email" placeholder="you@email.com"/>
+        </div>
+        <div class="auth-input-group">
+          <label>Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="reg-pass" placeholder="Min. 6 characters"/>
+            <button class="eye-btn" type="button" onclick="togglePw('reg-pass',this)">👁️</button>
+          </div>
+        </div>
+        <div class="auth-input-group">
+          <label>Blood Type</label>
+          <select id="reg-blood">
+            <option value="">-- Select blood type --</option>
+            <option>A+</option><option>A-</option>
+            <option>B+</option><option>B-</option>
+            <option>O+</option><option>O-</option>
+            <option>AB+</option><option>AB-</option>
+          </select>
+        </div>
+        <div class="auth-input-group">
+          <label>Date of Birth</label>
+          <input type="date" id="reg-dob" style="color-scheme:dark;"/>
+        </div>
+        <div class="auth-error" id="reg-error">❌ Please fill all required fields.</div>
+        <button class="btn-auth" onclick="doRegister()">Create Account</button>
+        <div class="auth-switch">Already have an account? <span onclick="switchScreen('login','register')">Sign in</span></div>
+      </div>
+      <div class="auth-footer"><p>LifeCard Patient v1.0 · HIPAA Compliant · 🔒 Encrypted</p></div>
+    </div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div class="screen" id="home">
+    <div class="status-bar dark"><span id="home-clock">9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="home-header">
+      <div class="home-top">
+        <div>
+          <div class="home-greeting" id="home-greeting">Good Morning,</div>
+          <div class="home-name" id="display-name">—</div>
+          <div class="home-pid">PID-<span id="display-pid">—</span> · <span id="display-blood" style="color:#FFB3B0;font-weight:800;">—</span></div>
+        </div>
+        <div class="home-avatar" id="home-avatar" onclick="openVirtualLifeCard()">👤</div>
+      </div>
+    </div>
+    <div class="scroll-content" style="padding-bottom:80px;">
+      <div id="health-status-banner" class="status-banner ok">
+        <div id="status-dot" class="status-dot green"></div>
+        <div>
+          <div id="status-text" class="status-banner-text">All Systems Good ✓</div>
+          <div id="status-sub" class="status-banner-sub">No critical alerts at this time</div>
+        </div>
+      </div>
+      <div class="quick-cards">
+        <div class="qcard" onclick="navTo('my-health')">
+          <div class="qcard-label">Blood Type</div>
+          <div class="qcard-value" id="home-blood">—</div>
+          <div class="qcard-sub" id="home-blood-sub">—</div>
+        </div>
+        <div class="qcard danger" onclick="navTo('my-health')">
+          <div class="qcard-label">Allergies</div>
+          <div class="qcard-value" id="home-allergy-count">0</div>
+          <div class="qcard-sub" id="home-allergy-list">None</div>
+        </div>
+        <div class="qcard" onclick="navTo('my-health')">
+          <div class="qcard-label">Conditions</div>
+          <div class="qcard-value" id="home-conditions-count">0</div>
+          <div class="qcard-sub" id="home-conditions-sub">None</div>
+        </div>
+        <div class="qcard" onclick="navTo('my-health')">
+          <div class="qcard-label">Last Scan</div>
+          <div class="qcard-value" id="home-last-scan-date">—</div>
+          <div class="qcard-sub" id="home-last-scan-sub">—</div>
+        </div>
+      </div>
+      <div class="home-viewcard-wrap" style="margin-top:12px;">
+        <button class="home-viewcard-btn" onclick="openVirtualLifeCard()">
+          <span class="home-viewcard-icon">🪪</span>
+          <div class="home-viewcard-text">
+            <div class="home-viewcard-title">View Patient LifeCard</div>
+            <div class="home-viewcard-sub">Your digital medical ID · Tap to open</div>
+          </div>
+          <span class="home-viewcard-arrow">›</span>
+        </button>
+      </div>
+      <div class="section-header-sm">
+        <span class="section-title-sm">📢 Medical News</span>
+      </div>
+      <div class="news-scroll" id="news-scroll">
+        <div class="actlog-loading"><div class="spinner"></div> Loading announcements…</div>
+      </div>
+      <div class="section-header-sm" style="margin-top:4px;">
+        <span class="section-title-sm">📅 Recent Activity</span>
+        <span class="see-all-sm" onclick="navTo('alerts')">See All</span>
+      </div>
+      <div class="activity-row" id="home-activity-row">
+        <div class="act-item">
+          <div class="act-icon" style="background:var(--blue-light);">🔓</div>
+          <div class="act-info">
+            <div class="act-title">Signed In</div>
+            <div class="act-time">Loading…</div>
+          </div>
+          <span class="act-badge badge-scan">Login</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY HEALTH SCREEN -->
+  <div class="screen" id="my-health">
+    <div class="status-bar"><span>9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="health-hero">
+      <div class="health-hero-name" id="health-name">—</div>
+      <div class="health-hero-pid" id="health-pid">PID-—</div>
+      <div class="health-chips">
+        <span class="health-chip" id="health-chip-blood">—</span>
+        <span class="health-chip" id="health-chip-allergies">No Allergies</span>
+        <span class="health-chip" id="health-chip-conditions">No Conditions</span>
+      </div>
+    </div>
+    <div class="scroll-content" style="padding-bottom:80px;">
+      <div class="health-updated-banner">
+        <div class="hub-left">
+          <span class="hub-icon">🏥</span>
+          <div>
+            <div class="hub-text" id="hub-doctor">Medical Record</div>
+            <div class="hub-sub" id="hub-hospital">Health Facility</div>
+          </div>
+        </div>
+        <button class="hub-history-btn" onclick="openModal('history')">History</button>
+      </div>
+      <div class="health-section">
+        <!-- Basic Info -->
+        <div class="health-card">
+          <div class="health-card-header">
+            <span class="health-card-title">🩸 Basic Info</span>
+            <button class="edit-btn" onclick="openModal('info')">Edit</button>
+          </div>
+          <div class="health-card-body">
+            <div class="hrow"><span class="hrow-label">Full Name</span><span class="hrow-value" id="info-name">—</span></div>
+            <div class="hrow"><span class="hrow-label">Date of Birth</span><span class="hrow-value" id="info-dob">—</span></div>
+            <div class="hrow"><span class="hrow-label">Blood Type</span><span class="hrow-value" id="info-blood">—</span></div>
+            <div class="hrow"><span class="hrow-label">Height / Weight</span><span class="hrow-value" id="info-hw">—</span></div>
+            <div class="hrow"><span class="hrow-label">Sex at Birth</span><span class="hrow-value" id="info-sex">—</span></div>
+            <div class="hrow"><span class="hrow-label">Phone</span><span class="hrow-value" id="info-phone">—</span></div>
+            <div class="hrow"><span class="hrow-label">Email</span><span class="hrow-value" id="info-email">—</span></div>
+            <div class="hrow"><span class="hrow-label">Address</span><span class="hrow-value" id="info-address">—</span></div>
+            <div class="hrow"><span class="hrow-label">LifeCard ID</span><span class="hrow-value" id="info-lcid">—</span></div>
+            <div class="hrow"><span class="hrow-label">Diagnosed By</span><span class="hrow-value" id="info-diagnosby">—</span></div>
+            <div class="hrow"><span class="hrow-label">Hospital</span><span class="hrow-value" id="info-hospital">—</span></div>
+          </div>
+        </div>
+        <!-- Allergies — READ ONLY, no edit button -->
+        <div class="health-card">
+          <div class="health-card-header">
+            <span class="health-card-title">⚠️ Allergies</span>
+            <span style="font-size:10px;color:var(--text-sec);font-weight:600;">Managed by doctor</span>
+          </div>
+          <div class="health-card-body" id="allergies-display">
+            <span class="tag tag-red">None recorded</span>
+          </div>
+        </div>
+        <!-- Medications — READ ONLY, no edit button -->
+        <div class="health-card">
+          <div class="health-card-header">
+            <span class="health-card-title">💊 Medications</span>
+            <span style="font-size:10px;color:var(--text-sec);font-weight:600;">Managed by doctor</span>
+          </div>
+          <div class="health-card-body" id="meds-display">
+            <div class="hrow"><span class="hrow-label">None recorded</span><span class="hrow-value">—</span></div>
+          </div>
+        </div>
+        <!-- Conditions — READ ONLY, no edit button -->
+        <div class="health-card">
+          <div class="health-card-header">
+            <span class="health-card-title">🏥 Conditions</span>
+            <span style="font-size:10px;color:var(--text-sec);font-weight:600;">Managed by doctor</span>
+          </div>
+          <div class="health-card-body" id="conditions-display">
+            <span class="tag tag-orange">None recorded</span>
+          </div>
+        </div>
+        <!-- Emergency Contact -->
+        <div class="health-card">
+          <div class="health-card-header">
+            <span class="health-card-title">📞 Emergency Contact</span>
+            <button class="edit-btn" onclick="openModal('emergency')">Edit</button>
+          </div>
+          <div class="health-card-body" id="emergency-card-body">
+            <div class="ec-name">—</div>
+            <div class="ec-rel">— · Primary Contact</div>
+            <div class="ec-phone">📞 —</div>
+          </div>
+        </div>
+        <!-- Patient Timeline -->
+        <div class="health-card">
+          <div class="health-card-header">
+            <span class="health-card-title">📅 Medical Timeline</span>
+          </div>
+          <div class="health-card-body" style="padding:8px 0;">
+            <div class="timeline-wrap" id="timeline-wrap">
+              <div class="tl-loading"><div class="spinner"></div> Loading…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHATS SCREEN -->
+  <div class="screen" id="chats">
+    <div class="status-bar dark" style="background:linear-gradient(135deg,#1565C0,#0D47A1);"><span>9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="chats-header">
+      <div class="chats-header-top">
+        <div>
+          <div class="chats-header-title">💬 Chats</div>
+          <div class="chats-header-sub">Your healthcare conversations</div>
+        </div>
+        <div class="chats-header-actions">
+          <button class="chats-action-btn" onclick="showToast('✏️ New chat coming soon')">✏️</button>
+        </div>
+      </div>
+    </div>
+    <div class="chats-search">
+      <span class="chats-search-icon">🔍</span>
+      <input class="chats-search-input" type="text" placeholder="Search conversations…" oninput="filterChats(this.value)"/>
+    </div>
+    <div class="scroll-content" style="padding-bottom:80px;">
+      <div class="chats-section-label">Pinned</div>
+      <div class="chat-item" onclick="showToast('💬 Opening chat…')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
+          🏥
+          <div class="chat-avatar-online"></div>
+        </div>
+        <div class="chat-info">
+          <div class="chat-name">LifeCard Support</div>
+          <div class="chat-preview chat-typing">● typing…</div>
+        </div>
+        <div class="chat-meta">
+          <div class="chat-time">Now</div>
+          <div class="chat-badge">3</div>
+        </div>
+      </div>
+
+      <div class="chats-section-label" style="margin-top:4px;">Recent</div>
+
+      <div class="chat-item" onclick="showToast('💬 Opening chat with Dr. Mendigoria…')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);">👨‍⚕️</div>
+        <div class="chat-info">
+          <div class="chat-name">Dr. Mendigoria</div>
+          <div class="chat-preview">Your next check-up is scheduled for…</div>
+        </div>
+        <div class="chat-meta">
+          <div class="chat-time">2m</div>
+          <div class="chat-badge">1</div>
+        </div>
+      </div>
+
+      <div class="chat-item" onclick="showToast('💬 Opening chat with Nurse on Duty…')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#E65100,#BF360C);">👩‍⚕️</div>
+        <div class="chat-info">
+          <div class="chat-name">Nurse on Duty</div>
+          <div class="chat-preview">Please take your medication at 8 PM tonight.</div>
+        </div>
+        <div class="chat-meta">
+          <div class="chat-time">15m</div>
+        </div>
+      </div>
+
+      <div class="chat-item" onclick="showToast('💬 Opening chat with PGH Cardiology…')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#6A1B9A,#4A148C);">🫀</div>
+        <div class="chat-info">
+          <div class="chat-name">PGH Cardiology</div>
+          <div class="chat-preview">Your lab results are now available.</div>
+        </div>
+        <div class="chat-meta">
+          <div class="chat-time">1h</div>
+          <div class="chat-badge">2</div>
+        </div>
+      </div>
+
+      <div class="chat-item" onclick="showToast('💬 Opening chat with Pharmacy…')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#1565C0,#0A1628);">💊</div>
+        <div class="chat-info">
+          <div class="chat-name">Hospital Pharmacy</div>
+          <div class="chat-preview">Your prescription is ready for pickup.</div>
+        </div>
+        <div class="chat-meta">
+          <div class="chat-time">3h</div>
+        </div>
+      </div>
+
+      <div class="chat-item" onclick="showToast('💬 Opening chat with Billing…')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#E53935,#B71C1C);">🧾</div>
+        <div class="chat-info">
+          <div class="chat-name">Billing &amp; Finance</div>
+          <div class="chat-preview">Statement of account for April 2026.</div>
+        </div>
+        <div class="chat-meta">
+          <div class="chat-time">Yesterday</div>
+        </div>
+      </div>
+
+      <div class="chat-item" onclick="showToast('💬 Opening chat with Radiology…')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#00838F,#006064);">🩻</div>
+        <div class="chat-info">
+          <div class="chat-name">Radiology Dept.</div>
+          <div class="chat-preview">Your X-ray images have been uploaded.</div>
+        </div>
+        <div class="chat-meta">
+          <div class="chat-time">2d</div>
+        </div>
+      </div>
+
+      <div style="padding:24px 16px;text-align:center;">
+        <div style="font-size:32px;margin-bottom:10px;">💬</div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);">Start a Conversation</div>
+        <div style="font-size:12px;color:var(--text-sec);margin-top:4px;line-height:1.5;">Connect with your doctors, nurses, and support team securely through LifeCard messaging.</div>
+        <button onclick="showToast('✏️ New chat feature coming soon!')" style="margin-top:14px;padding:10px 24px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">+ New Conversation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCAN / STORIES SCREEN -->
+  <div class="screen" id="scan">
+    <div class="status-bar"><span>9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="stories-header">
+      <div class="stories-header-title">Recovery Stories</div>
+      <div class="stories-header-sub">Inspiring journeys from our community</div>
+    </div>
+    <div class="stories-filter">
+      <button class="filter-chip active" onclick="filterStories(this)">All</button>
+      <button class="filter-chip" onclick="filterStories(this)">Heart</button>
+      <button class="filter-chip" onclick="filterStories(this)">Cancer</button>
+      <button class="filter-chip" onclick="filterStories(this)">Diabetes</button>
+      <button class="filter-chip" onclick="filterStories(this)">Mental Health</button>
+      <button class="filter-chip" onclick="filterStories(this)">Orthopedic</button>
+    </div>
+    <div class="scroll-content" style="padding-bottom:80px;">
+      <div class="story-card">
+        <div class="story-card-header">
+          <div class="story-avatar" style="background:var(--red-light);">❤️</div>
+          <div class="story-author">
+            <div class="story-author-name">Maria Santos</div>
+            <div class="story-author-info">Heart Surgery · 2 years recovered</div>
+          </div>
+          <button class="story-follow" onclick="toggleFollow(this)">Follow</button>
+        </div>
+        <div class="story-body">
+          <div class="story-text">After my bypass surgery, I was told I'd never run again. Two years later, I completed my first 5K. The journey was difficult, but with the right support system and determination, nothing is impossible. <span class="story-text-see-more" onclick="showToast('📖 Full story coming soon')">See more</span></div>
+        </div>
+        <div class="story-image" style="background:linear-gradient(135deg,#FFEBEE,#FFCDD2);">🏃‍♀️</div>
+        <div class="story-footer">
+          <div class="story-react" onclick="toggleLike(this)"><span class="story-react-icon">🤍</span> 342</div>
+          <div class="story-comment" onclick="showToast('💬 Comments coming soon')">💬 28</div>
+          <div class="story-share" onclick="showToast('📤 Shared!')">📤 Share</div>
+        </div>
+      </div>
+
+      <div class="story-card">
+        <div class="story-card-header">
+          <div class="story-avatar" style="background:var(--blue-light);">💊</div>
+          <div class="story-author">
+            <div class="story-author-name">Marco Reyes</div>
+            <div class="story-author-info">Type 2 Diabetes · Managing since 2019</div>
+          </div>
+          <button class="story-follow following" onclick="toggleFollow(this)">Following</button>
+        </div>
+        <div class="story-body">
+          <div class="story-text">Changed my diet, started walking 30 minutes a day, and now my A1C is in the normal range for the first time in 6 years. Small consistent steps make all the difference. <span class="story-text-see-more" onclick="showToast('📖 Full story coming soon')">See more</span></div>
+        </div>
+        <div class="story-image" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);">🥗</div>
+        <div class="story-footer">
+          <div class="story-react" onclick="toggleLike(this)"><span class="story-react-icon">🤍</span> 189</div>
+          <div class="story-comment" onclick="showToast('💬 Comments coming soon')">💬 15</div>
+          <div class="story-share" onclick="showToast('📤 Shared!')">📤 Share</div>
+        </div>
+      </div>
+
+      <div class="story-card">
+        <div class="story-card-header">
+          <div class="story-avatar" style="background:var(--orange-light);">🧠</div>
+          <div class="story-author">
+            <div class="story-author-name">Ana Lim</div>
+            <div class="story-author-info">Anxiety &amp; Depression · 3 years healing</div>
+          </div>
+          <button class="story-follow" onclick="toggleFollow(this)">Follow</button>
+        </div>
+        <div class="story-body">
+          <div class="story-text">For the longest time, I was ashamed to admit I needed help. Therapy and medication saved my life. If you're struggling right now, please hear this: seeking help is not weakness -- it's the bravest thing you'll ever do. <span class="story-text-see-more" onclick="showToast('📖 Full story coming soon')">See more</span></div>
+        </div>
+        <div class="story-footer">
+          <div class="story-react liked" onclick="toggleLike(this)"><span class="story-react-icon">❤️</span> 521</div>
+          <div class="story-comment" onclick="showToast('💬 Comments coming soon')">💬 47</div>
+          <div class="story-share" onclick="showToast('📤 Shared!')">📤 Share</div>
+        </div>
+      </div>
+
+      <div class="story-card">
+        <div class="story-card-header">
+          <div class="story-avatar" style="background:var(--green-light);">🎗️</div>
+          <div class="story-author">
+            <div class="story-author-name">Carmen Villanueva</div>
+            <div class="story-author-info">Breast Cancer Survivor · 5 years cancer-free</div>
+          </div>
+          <button class="story-follow following" onclick="toggleFollow(this)">Following</button>
+        </div>
+        <div class="story-body">
+          <div class="story-text">Five years ago I finished my last chemo session. Today I celebrated by climbing Mt. Maculot. The journey was brutal -- surgery, chemo, radiation, and countless sleepless nights. But here I am, stronger than ever. <span class="story-text-see-more" onclick="showToast('📖 Full story coming soon')">See more</span></div>
+        </div>
+        <div class="story-image" style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);">🏔️</div>
+        <div class="story-footer">
+          <div class="story-react" onclick="toggleLike(this)"><span class="story-react-icon">🤍</span> 876</div>
+          <div class="story-comment" onclick="showToast('💬 Comments coming soon')">💬 92</div>
+          <div class="story-share" onclick="showToast('📤 Shared!')">📤 Share</div>
+        </div>
+      </div>
+
+      <div class="story-card">
+        <div class="story-card-header">
+          <div class="story-avatar" style="background:var(--red-light);">🦴</div>
+          <div class="story-author">
+            <div class="story-author-name">Jose Ramos</div>
+            <div class="story-author-info">Knee Replacement · 1 year recovered</div>
+          </div>
+          <button class="story-follow" onclick="toggleFollow(this)">Follow</button>
+        </div>
+        <div class="story-body">
+          <div class="story-text">After years of chronic knee pain, I finally got my total knee replacement at 62. The rehab was tough -- 3 months of physical therapy, but now I can play with my grandchildren again. <span class="story-text-see-more" onclick="showToast('📖 Full story coming soon')">See more</span></div>
+        </div>
+        <div class="story-footer">
+          <div class="story-react" onclick="toggleLike(this)"><span class="story-react-icon">🤍</span> 134</div>
+          <div class="story-comment" onclick="showToast('💬 Comments coming soon')">💬 9</div>
+          <div class="story-share" onclick="showToast('📤 Shared!')">📤 Share</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY LOG & ALERTS SCREEN -->
+  <div class="screen" id="alerts">
+    <div class="status-bar"><span>9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="actlog-header">
+      <div class="actlog-header-title">🔔 Activity Log</div>
+      <div class="actlog-header-sub">All your recent activity and alerts</div>
+    </div>
+    <div class="actlog-filter-row">
+      <button class="actlog-chip active" onclick="filterActivityLog(this,'all')">All</button>
+      <button class="actlog-chip" onclick="filterActivityLog(this,'login')">Login/Out</button>
+      <button class="actlog-chip" onclick="filterActivityLog(this,'update')">Updates</button>
+      <button class="actlog-chip" onclick="filterActivityLog(this,'order')">Orders</button>
+    </div>
+    <div class="scroll-content" style="padding-bottom:80px;">
+      <div class="actlog-section-label">Recent Activity</div>
+      <div class="actlog-list" id="actlog-list">
+        <div class="actlog-loading"><div class="spinner"></div> Loading activity…</div>
+      </div>
+      <div class="actlog-section-label" style="margin-top:8px;">System Alerts</div>
+      <div id="actlog-alerts-wrap">
+        <div class="actlog-loading"><div class="spinner"></div> Loading alerts…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div class="screen" id="settings">
+    <div class="status-bar"><span>9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="settings-hero">
+      <div class="settings-avi" id="settings-avi">👤</div>
+      <div class="settings-name" id="settings-name">—</div>
+      <div class="settings-pid" id="settings-pid">— · —</div>
+    </div>
+    <div class="scroll-content" style="padding-bottom:80px;">
+      <div class="settings-section">
+        <div class="settings-section-title">Privacy &amp; Access</div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#E3F2FD;">🔒</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Share Blood Type</div>
+              <div class="settings-row-value">Always visible to doctors</div>
+            </div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="toggle-blood" onchange="saveToggle('patient_ShareBloodType',this.checked)"/><span class="toggle-track"></span></label></div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#FFEBEE;">⚠️</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Share Allergies</div>
+              <div class="settings-row-value">Critical for emergency care</div>
+            </div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="toggle-allergies" onchange="saveToggle('patient_ShareAllergies',this.checked)"/><span class="toggle-track"></span></label></div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#E8F5E9;">💊</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Share Medications</div>
+              <div class="settings-row-value">Visible to authorized doctors</div>
+            </div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="toggle-medic" onchange="saveToggle('patient_ShareMedic',this.checked)"/><span class="toggle-track"></span></label></div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#FFF3E0;">📍</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Emergency Location</div>
+              <div class="settings-row-value">Share location with family contacts</div>
+            </div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="toggle-emergency" onchange="saveToggle('patient_Emergency',this.checked)"/><span class="toggle-track"></span></label></div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="openModal('editProfile')">
+            <div class="settings-row-icon" style="background:#E3F2FD;">👤</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Edit Profile</div>
+              <div class="settings-row-value">Name, address, birthday, email, phone</div>
+            </div>
+            <div class="settings-row-action">›</div>
+          </div>
+          <div class="settings-row" onclick="openModal('changePassword')">
+            <div class="settings-row-icon" style="background:#F3E5F5;">🔑</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Change Password</div>
+              <div class="settings-row-value">Last changed 30 days ago</div>
+            </div>
+            <div class="settings-row-action">›</div>
+          </div>
+          <div class="settings-row" style="cursor:default;">
+            <div class="settings-row-icon" style="background:#E8F5E9;">🌙</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Dark Mode</div>
+              <div class="settings-row-value" id="theme-label">Currently: Dark</div>
+            </div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="theme-toggle" checked onchange="toggleTheme()"/><span class="toggle-track"></span></label></div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">Features</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="openDigitalCard()">
+            <div class="settings-row-icon" style="background:#E8F5E9;">🪪</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Digital Card</div>
+              <div class="settings-row-value">Your medical ID on your phone</div>
+            </div>
+            <div class="settings-row-action">›</div>
+          </div>
+          <div class="settings-row" onclick="startOrder('PATIENT CARD', 599)">
+            <div class="settings-row-icon" style="background:#FFF3E0;">💳</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Order Patient Card</div>
+              <div class="settings-row-value">Physical card · Php 599 one-time</div>
+            </div>
+            <div class="settings-row-action">›</div>
+          </div>
+          <div class="settings-row" onclick="openLifeCard()">
+            <div class="settings-row-icon" style="background:#E8F5E9;">📿</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">LifeCard +</div>
+              <div class="settings-row-value">RFID bracelet for emergency access</div>
+            </div>
+            <div class="settings-row-action">›</div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">Order Status</div>
+        <div id="order-status-wrap">
+          <div class="osc-loading"><div class="spinner"></div> Loading orders…</div>
+        </div>
+      </div>
+      <!-- ALERTS SECTION — shows ActivityLog of the logged-in patient -->
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">🔔 Alerts &amp; Activity Log</div>
+        <div class="settings-actlog-wrap" id="settings-actlog-wrap">
+          <div class="settings-actlog-loading"><div class="spinner"></div> Loading…</div>
+        </div>
+      </div>
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">About</div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#F3E5F5;">📋</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">App Version</div>
+              <div class="settings-row-value">LifeCard Patient v1.0.0</div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#E8F5E9;">🔒</div>
+            <div class="settings-row-info">
+              <div class="settings-row-label">Privacy Policy</div>
+              <div class="settings-row-value">HIPAA Compliant · End-to-End Encrypted</div>
+            </div>
+            <div class="settings-row-action">›</div>
+          </div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Sign Out</button>
+    </div>
+  </div>
+
+  <!-- GLOBAL BOTTOM NAV -->
+  <nav class="bottom-nav" id="patient-nav">
+    <button class="nav-item active" id="pnav-home" onclick="navTo('home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-text">Home</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" id="pnav-chats" onclick="navTo('chats')">
+      <span class="nav-icon">💬</span>
+      <span class="nav-text">Chats</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-scan-btn" id="pnav-scan" onclick="navTo('scan')">
+      <div class="nav-scan-circle">📖</div>
+      <span class="nav-scan-text">Stories</span>
+    </button>
+    <button class="nav-item" id="pnav-health" onclick="navTo('my-health')">
+      <span class="nav-icon">❤️</span>
+      <span class="nav-text">My Health</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" id="pnav-settings" onclick="navTo('settings')">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-text">Settings</span>
+      <div class="nav-dot"></div>
+    </button>
+  </nav>
+
+  <!-- EDIT MODALS -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-sheet" id="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="modal-title">Edit</div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- INFO / ALERT MODAL -->
+  <div class="info-modal-overlay" id="info-modal-overlay">
+    <div class="info-modal-box">
+      <div class="info-modal-icon" id="info-modal-icon">⚠️</div>
+      <div class="info-modal-title" id="info-modal-title">Notice</div>
+      <div class="info-modal-body" id="info-modal-body"></div>
+      <button class="info-modal-btn" id="info-modal-btn" onclick="closeInfoModal()">OK, Got it</button>
+    </div>
+  </div>
+
+  <!-- CAMERA SCANNER OVERLAY -->
+  <div class="camera-overlay" id="camera-overlay">
+    <div class="camera-top-bar">
+      <span class="camera-title">📷 Scan QR Code</span>
+      <button class="camera-close-btn" onclick="closeScanner()">✕</button>
+    </div>
+    <video class="camera-video" id="camera-video" autoplay playsinline muted></video>
+    <div class="camera-frame" id="camera-frame">
+      <div class="camera-frame-corner tl"></div>
+      <div class="camera-frame-corner tr"></div>
+      <div class="camera-frame-corner bl"></div>
+      <div class="camera-frame-corner br"></div>
+      <div class="camera-scan-line"></div>
+    </div>
+    <div id="camera-denied-wrap" style="display:none;position:absolute;inset:0;background:#000;flex-direction:column;align-items:center;justify-content:center;">
+      <div class="camera-denied">
+        <div class="camera-denied-icon">🚫</div>
+        <div class="camera-denied-title">Camera Access Denied</div>
+        <div class="camera-denied-msg">Please allow camera access in your browser settings to use the QR scanner.</div>
+        <button class="camera-denied-btn" onclick="closeScanner()">Close</button>
+      </div>
+    </div>
+    <div class="camera-bottom-bar">
+      <div class="camera-hint">Point your camera at a QR code to scan</div>
+    </div>
+  </div>
+
+  <!-- VIRTUAL LIFECARD OVERLAY -->
+  <div class="vlc-overlay" id="vlc-overlay">
+    <div class="vlc-topbar">
+      <div class="vlc-topbar-left">
+        <span style="font-size:20px;">🪪</span>
+        <span class="vlc-topbar-title">Patient LifeCard</span>
+      </div>
+      <button class="vlc-close-btn" onclick="closeVirtualLifeCard()">×</button>
+    </div>
+    <div class="vlc-scroll">
+      <div class="vlc-flip-hint">🔄 Tap card or button to flip · Front / Back</div>
+
+      <div class="vlc-card-scene" id="vlc-card-scene" onclick="flipVlcCard()">
+        <div class="vlc-card-inner" id="vlc-card-inner">
+
+          <!-- FRONT FACE -->
+          <div class="vlc-card-face vlc-front-face">
+            <div class="vlc-front-header">
+              <div class="vlc-photo-circle" id="vlc-initials">?</div>
+              <div class="vlc-front-meta">
+                <div class="vlc-front-name" id="vlc-front-name">—</div>
+                <div class="vlc-front-lcid" id="vlc-front-lcid">—</div>
+                <div class="vlc-front-pid" id="vlc-front-pid">PID-—</div>
+              </div>
+              <div class="vlc-blood-badge" id="vlc-front-blood">—</div>
+            </div>
+            <div class="vlc-front-body">
+              <div class="vlc-front-fields">
+                <div class="vlc-ffield">
+                  <div class="vlc-ffield-label">Date of Birth</div>
+                  <div class="vlc-ffield-val" id="vlc-dob">—</div>
+                </div>
+                <div class="vlc-ffield">
+                  <div class="vlc-ffield-label">Known Allergies</div>
+                  <div class="vlc-ffield-val" id="vlc-allergies-chips"><span class="vlc-allergy-chip">None</span></div>
+                </div>
+                <div class="vlc-ffield">
+                  <div class="vlc-ffield-label">Conditions</div>
+                  <div class="vlc-ffield-val" id="vlc-conditions-front">—</div>
+                </div>
+                <div class="vlc-ffield">
+                  <div class="vlc-ffield-label">Patient ID</div>
+                  <div class="vlc-ffield-val" id="vlc-pid-display">—</div>
+                </div>
+              </div>
+              <div class="vlc-qr-panel">
+                <div class="vlc-qr-label-top">Scan to verify</div>
+                <div class="vlc-qr-img">
+                  <img id="vlc-qr-img" src="" alt="QR" style="display:none;width:100%;height:100%;object-fit:cover;"/>
+                  <span id="vlc-qr-fallback">⬛</span>
+                </div>
+                <div class="vlc-qr-secure-line">Secured by<br/>MediScan</div>
+              </div>
+            </div>
+            <div class="vlc-front-footer">WEAR IT. SHARE IT. SAVE LIVES. • MEDISCAN</div>
+          </div>
+
+          <!-- BACK FACE -->
+          <div class="vlc-card-back-face vlc-back-face">
+            <div class="vlc-back-header">
+              <div class="vlc-alert-header-left">
+                <span class="vlc-alert-icon">🚨</span>
+                <div>
+                  <div class="vlc-alert-title">MEDICAL ALERT</div>
+                  <div class="vlc-alert-sub">Patient Health Summary · MediScan LifeCard</div>
+                </div>
+              </div>
+              <div class="vlc-responder-badge">⚠️ Show to first responders</div>
+            </div>
+            <div class="vlc-allergy-banner">⚠️ ALLERGY ALERT: <span id="vlc-allergy-banner-text">None Recorded</span></div>
+            <div class="vlc-alert-grid">
+              <div class="vlc-agcell">
+                <div class="vlc-agcell-icon">🩸</div>
+                <div class="vlc-agcell-label">Blood Type</div>
+                <div class="vlc-agcell-val" id="vlc-back-blood">—</div>
+              </div>
+              <div class="vlc-agcell">
+                <div class="vlc-agcell-icon">📏</div>
+                <div class="vlc-agcell-label">Height / Weight</div>
+                <div class="vlc-agcell-val sm" id="vlc-back-hw">— / —</div>
+              </div>
+              <div class="vlc-agcell">
+                <div class="vlc-agcell-icon">💊</div>
+                <div class="vlc-agcell-label">Medications</div>
+                <div class="vlc-agcell-val sm" id="vlc-back-meds">N/A</div>
+              </div>
+              <div class="vlc-agcell">
+                <div class="vlc-agcell-icon">❤️</div>
+                <div class="vlc-agcell-label">Conditions</div>
+                <div class="vlc-agcell-val sm" id="vlc-back-conditions">N/A</div>
+              </div>
+            </div>
+            <div class="vlc-ec-row">
+              <span class="vlc-ec-icon">📞</span>
+              <span class="vlc-ec-text" id="vlc-ec-full">Emergency contact not set</span>
+            </div>
+            <div class="vlc-back-footer">
+              <span class="vlc-back-footer-left">🔒 Protected by MediScan LifeCard</span>
+              <span class="vlc-back-footer-right">www.lifecard.ph</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <button class="vlc-flip-btn" onclick="flipVlcCard()">🔄 Flip Card</button>
+      <button class="vlc-download-btn" onclick="downloadLifeCard()">⬇️ Download LifeCard</button>
+      <div class="vlc-card-note">🔒 Your health data is encrypted and private</div>
+    </div>
+  </div>
+
+  <!-- LIFECARD+ OVERLAY -->
+  <div class="lc-overlay" id="lc-overlay">
+    <div class="dc-topbar">
+      <button class="dc-back-btn" onclick="closeLifeCard()">‹</button>
+      <span class="dc-topbar-title">📿 LifeCard +</span>
+    </div>
+    <div class="lc-scroll">
+      <div class="lc-hero">
+        <div class="lc-badge">🔰 RFID Technology</div>
+        <div class="lc-title">LifeCard +</div>
+        <div class="lc-subtitle">A bracelet with RFID technology — when the moment is in rush, the Doctor only needs to read your RFID and your information will be displayed on their device.</div>
+        <div class="lc-bracelet-wrap">
+          <div class="lc-bracelet">
+            <div class="lc-bracelet-icon">📿</div>
+            <div class="lc-bracelet-label">RFID Bracelet</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lc-body">
+        <div class="lc-how-title">How it works</div>
+        <div class="lc-step">
+          <div class="lc-step-num">1</div>
+          <div class="lc-step-text">Wear your LifeCard + bracelet on your wrist at all times</div>
+        </div>
+        <div class="lc-step">
+          <div class="lc-step-num">2</div>
+          <div class="lc-step-text">In an emergency, a doctor or responder scans the RFID chip</div>
+        </div>
+        <div class="lc-step">
+          <div class="lc-step-num">3</div>
+          <div class="lc-step-text">Your medical profile instantly appears on their device — no app needed</div>
+        </div>
+        <div class="lc-step">
+          <div class="lc-step-num">4</div>
+          <div class="lc-step-text">Critical info (blood type, allergies, conditions, contacts) is always accessible</div>
+        </div>
+
+        <div style="margin-top:14px;padding:14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-sm);">
+          <div style="color:#fff;font-size:12px;font-weight:700;margin-bottom:4px;">📌 Important</div>
+          <div style="color:rgba(255,255,255,0.65);font-size:12px;line-height:1.6;">To use LifeCard +, you must pay Php 1,999 to receive a LifeCard + bracelet. Delivery and setup instructions will be sent to your registered email.</div>
+        </div>
+      </div>
+
+      <div class="lc-cta-box">
+        <div class="lc-price">Php 1,999</div>
+        <div class="lc-price-label">One-time payment · Includes bracelet &amp; setup</div>
+        <button class="lc-order-btn" onclick="startOrder('LIFECARD PLUS', 1999)">
+          📿 Order Life Card +
+        </button>
+        <div class="lc-note">Receipt and delivery instructions sent to your email</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER FLOW OVERLAY -->
+  <div class="order-overlay" id="order-overlay">
+    <div class="order-sheet" id="order-sheet">
+      <div class="order-handle"></div>
+
+      <div class="order-steps">
+        <div class="order-step-dot active" id="ostep-1">1</div>
+        <div class="order-step-line" id="oline-1"></div>
+        <div class="order-step-dot" id="ostep-2">2</div>
+        <div class="order-step-line" id="oline-2"></div>
+        <div class="order-step-dot" id="ostep-3">3</div>
+        <div class="order-step-line" id="oline-3"></div>
+        <div class="order-step-dot" id="ostep-4">4</div>
+      </div>
+
+      <!-- STEP 1: Confirm Order -->
+      <div class="order-step-panel active" id="opanel-1">
+        <div class="order-panel-title">Confirm Your Order</div>
+        <div class="order-panel-sub" id="order-confirm-sub">Review your order details below.</div>
+        <div class="order-summary-box">
+          <div class="order-summary-row">
+            <span class="order-summary-label">Item</span>
+            <span class="order-summary-val" id="order-item-label">—</span>
+          </div>
+          <div class="order-summary-row">
+            <span class="order-summary-label">Patient</span>
+            <span class="order-summary-val" id="order-patient-label">—</span>
+          </div>
+          <div class="order-summary-row order-summary-total">
+            <span class="order-summary-label" style="font-weight:800;color:var(--text);">Total</span>
+            <span class="order-summary-val" id="order-total-label" style="color:var(--blue);font-size:16px;">—</span>
+          </div>
+        </div>
+        <button class="order-btn-primary" onclick="orderGoStep(2)">Continue to Payment →</button>
+        <button class="order-btn-secondary" onclick="closeOrder()">Cancel</button>
+      </div>
+
+      <!-- STEP 2: Select Payment -->
+      <div class="order-step-panel" id="opanel-2">
+        <div class="order-panel-title">Select Payment</div>
+        <div class="order-panel-sub">Choose your preferred payment method.</div>
+        <div class="payment-options">
+          <div class="payment-option" id="pay-gcash" onclick="selectPayment('GCash')">
+            <div class="payment-option-icon">💙</div>
+            <div>
+              <div class="payment-option-label">GCash</div>
+              <div class="payment-option-sub">Pay via GCash mobile wallet</div>
+            </div>
+            <div class="payment-check" id="pcheck-gcash"></div>
+          </div>
+          <div class="payment-option" id="pay-paymaya" onclick="selectPayment('PayMaya')">
+            <div class="payment-option-icon">💚</div>
+            <div>
+              <div class="payment-option-label">PayMaya</div>
+              <div class="payment-option-sub">Pay via PayMaya / Maya</div>
+            </div>
+            <div class="payment-check" id="pcheck-paymaya"></div>
+          </div>
+          <div class="payment-option" id="pay-paypal" onclick="selectPayment('PayPal')">
+            <div class="payment-option-icon">🔵</div>
+            <div>
+              <div class="payment-option-label">PayPal</div>
+              <div class="payment-option-sub">Pay via PayPal account</div>
+            </div>
+            <div class="payment-check" id="pcheck-paypal"></div>
+          </div>
+        </div>
+        <button class="order-btn-primary" id="btn-to-step3" onclick="orderGoStep(3)" disabled>Continue →</button>
+        <button class="order-btn-secondary" onclick="orderGoStep(1)">← Back</button>
+      </div>
+
+      <!-- STEP 3: Upload Proof -->
+      <div class="order-step-panel" id="opanel-3">
+        <div class="order-panel-title">Proof of Payment</div>
+        <div class="order-panel-sub">Upload a screenshot or photo of your payment confirmation.</div>
+        <div class="proof-upload-area" id="proof-upload-area" onclick="document.getElementById('proof-file-input').click()">
+          <div class="proof-upload-icon" id="proof-icon">📎</div>
+          <div class="proof-upload-label" id="proof-label">Tap to upload proof</div>
+          <div class="proof-upload-sub" id="proof-sub">JPG, PNG, or PDF accepted</div>
+        </div>
+        <input type="file" class="proof-file-input" id="proof-file-input" accept="image/*,application/pdf" onchange="onProofSelected(this)"/>
+        <button class="order-btn-primary" id="btn-to-step4" onclick="orderGoStep(4)" disabled>Continue →</button>
+        <button class="order-btn-secondary" onclick="orderGoStep(2)">← Back</button>
+      </div>
+
+      <!-- STEP 4: Remarks + Thank You -->
+      <div class="order-step-panel" id="opanel-4">
+        <div id="step4-remarks-wrap">
+          <div class="order-panel-title">Enter Remarks</div>
+          <div class="order-panel-sub">Add any notes or special instructions for your order (optional).</div>
+          <div class="modal-input-group">
+            <label>Remarks</label>
+            <textarea class="modal-input" id="order-remarks" rows="3" style="resize:none;" placeholder="e.g. Delivery address, preferred schedule..."></textarea>
+          </div>
+          <button class="order-btn-primary" id="btn-submit-order" onclick="submitOrder()">Submit Order</button>
+          <button class="order-btn-secondary" onclick="orderGoStep(3)">← Back</button>
+        </div>
+        <div id="step4-thankyou" style="display:none;">
+          <div class="order-success-wrap">
+            <div class="order-success-icon">✅</div>
+            <div class="order-success-title">Thank You for Your Payment!</div>
+            <div class="order-success-msg">A receipt will be sent to your email with the following instruction on how and when you will receive it.</div>
+            <button class="order-success-close" onclick="closeOrder()">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://gavjiejjhrvizfnizwwf.supabase.co/rest/v1';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhdmppZWpqaHJ2aXpmbml6d3dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MzE0MjAsImV4cCI6MjA5MzUwNzQyMH0.Rw_Pz52eFSbk96l_BMCPvjxt0Sxzem5bNnFZcCUHllI';
+
+const SUPA_HEADERS = {
+  'apikey': SUPA_KEY,
+  'Authorization': 'Bearer ' + SUPA_KEY,
+  'Content-Type': 'application/json'
+};
+
+/* ── SCREENS includes 'chats' and 'alerts' so nav stays visible ── */
+const SCREENS = ['home','my-health','scan','chats','alerts','settings'];
+let screenStack = ['login'];
+let currentUser = null;
+
+/* ─── ACTIVITY LOG WRITER ─── */
+async function insertActivityLog(description) {
+  if (!currentUser) return;
+  const capturedUsername = currentUser.patient_Username || '';
+  const capturedId = String(currentUser.patient_id || '');
+  const capturedFullname = currentUser.patient_fullname || currentUser.patient_Username || '';
+
+  let ipAddress = 'Unknown';
+  try {
+    const ipRes = await Promise.race([
+      fetch('https://api.ipify.org?format=json'),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000))
+    ]);
+    if (ipRes && ipRes.ok) { const d = await ipRes.json(); ipAddress = d.ip || 'Unknown'; }
+  } catch (_) {}
+
+  const device = (navigator.userAgent || 'Unknown Device').substring(0, 120);
+  const fullDesc = description + ' | Device: ' + device + ' | IP: ' + ipAddress;
+
+  const payload = {
+    activityLogDescription: fullDesc,
+    ActivityLogRole: 'Patient',
+    ActivityLogUsername: capturedUsername,
+    ActivityLogID: capturedId,
+    ActivityLogFULLNAME: capturedFullname
+  };
+  try {
+    await fetch(SUPA_URL + '/ActivityLog', {
+      method: 'POST',
+      headers: { ...SUPA_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload)
+    });
+  } catch (_) {}
+}
+
+/* ─── NAVIGATION ─── */
+function goTo(to, from) {
+  const toEl = document.getElementById(to);
+  const fromEl = document.getElementById(from || screenStack[screenStack.length - 1]);
+  if (fromEl) {
+    fromEl.classList.remove('active', 'animate-in');
+    fromEl.classList.add('slide-left', 'animate-out');
+  }
+  toEl.classList.add('active', 'animate-in');
+  toEl.classList.remove('slide-left', 'animate-out');
+  screenStack.push(to);
+  setTimeout(() => { if (fromEl) fromEl.classList.remove('slide-left', 'animate-out'); }, 320);
+  const isMain = SCREENS.includes(to);
+  const nav = document.getElementById('patient-nav');
+  if (isMain) { nav.classList.add('visible'); setNavActive(to); }
+  else nav.classList.remove('visible');
+}
+
+function switchScreen(to, from) {
+  const toEl = document.getElementById(to);
+  const fromEl = document.getElementById(from);
+  if (fromEl) {
+    fromEl.classList.remove('active', 'animate-in');
+    fromEl.classList.add('slide-left', 'animate-out');
+  }
+  toEl.classList.add('active', 'animate-in');
+  toEl.classList.remove('slide-left', 'animate-out');
+  screenStack = [to];
+  setTimeout(() => { if (fromEl) fromEl.classList.remove('slide-left', 'animate-out'); }, 320);
+}
+
+function navTo(screen) {
+  const cur = screenStack[screenStack.length - 1];
+  if (cur === screen) return;
+  goTo(screen, cur);
+  if (screen === 'alerts') loadActivityLog();
+  if (screen === 'settings') { loadOrderStatus(); loadSettingsActivityLog(); }
+}
+
+function setNavActive(screen) {
+  document.querySelectorAll('#patient-nav .nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('#patient-nav .nav-scan-btn').forEach(el => el.classList.remove('active'));
+  const map = {
+    home: 'pnav-home',
+    'my-health': 'pnav-health',
+    scan: 'pnav-scan',
+    chats: 'pnav-chats',
+    alerts: 'pnav-chats',
+    settings: 'pnav-settings'
+  };
+  const el = document.getElementById(map[screen]);
+  if (el) el.classList.add('active');
+}
+
+/* ─── PASSWORD TOGGLE ─── */
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+
+function toggleModalPw(id, btn) {
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+
+/* ─── AUTH LOADING OVERLAY HELPERS ─── */
+function showAuthLoader(icon, text, sub) {
+  const overlay = document.getElementById('auth-load-overlay');
+  if (!overlay) return;
+  const iconEl = document.getElementById('auth-load-icon');
+  const textEl = document.getElementById('auth-load-text');
+  const subEl  = document.getElementById('auth-load-sub');
+  if (iconEl) iconEl.textContent = icon || '🩺';
+  if (textEl) textEl.textContent = text || 'Please wait…';
+  if (subEl)  subEl.textContent  = sub  || '';
+  overlay.classList.add('visible');
+}
+function hideAuthLoader() {
+  const overlay = document.getElementById('auth-load-overlay');
+  if (overlay) overlay.classList.remove('visible');
+}
+
+/* ─── SUPABASE LOGIN ─── */
+async function doLogin() {
+  const username = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  const err = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+
+  err.style.display = 'none';
+
+  if (!username || !pass) {
+    err.textContent = '❌ Please enter your username and password.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+  showAuthLoader('🩺', 'Signing In…', 'Verifying your credentials');
+
+  try {
+    let res = await fetch(
+      SUPA_URL + '/PatientSide?patient_Username=eq.' + encodeURIComponent(username) + '&select=*',
+      { headers: SUPA_HEADERS }
+    );
+
+    if (!res.ok) {
+      res = await fetch(
+        SUPA_URL + '/PatientSide?select=*&limit=200',
+        { headers: SUPA_HEADERS }
+      );
+    }
+
+    if (!res.ok) {
+      err.textContent = '❌ Server error (' + res.status + '). Please try again.';
+      err.style.display = 'block';
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      hideAuthLoader();
+      return;
+    }
+
+    const rows = await res.json();
+    const data = Array.isArray(rows)
+      ? rows.filter(r =>
+          String(r.patient_Username || '').toLowerCase() === username.toLowerCase() &&
+          String(r.patient_Password || '') === pass
+        )
+      : [];
+
+    if (data.length === 0) {
+      err.textContent = '❌ Invalid username or password.';
+      err.style.display = 'block';
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      hideAuthLoader();
+      return;
+    }
+
+    const patient = data[0];
+
+    const isDeleted = String(patient.patient_delstats).toLowerCase() === 'true';
+    if (isDeleted) {
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      hideAuthLoader();
+      showInfoModal(
+        '🚫',
+        'Account Deactivated',
+        'This Account is Deactivated. Please Contact Support to Fix this.<br><br>Support: <a href="mailto:christianmendigoria23@gmail.com">christianmendigoria23@gmail.com</a>',
+        'danger'
+      );
+      return;
+    }
+
+    const isOnline = String(patient.patient_activestats).toLowerCase() === 'online';
+    if (isOnline) {
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      hideAuthLoader();
+      showInfoModal(
+        '⚠️',
+        'Account Already Logged In',
+        'This Account is Already Login. Please Contact Support to Fix this.<br><br>Support: <a href="mailto:christianmendigoria23@gmail.com">christianmendigoria23@gmail.com</a>',
+        'warn'
+      );
+      return;
+    }
+
+    try {
+      await fetch(
+        SUPA_URL + '/PatientSide?patient_id=eq.' + patient.patient_id,
+        {
+          method: 'PATCH',
+          headers: { ...SUPA_HEADERS, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ patient_activestats: 'Online' })
+        }
+      );
+    } catch (patchErr) {}
+
+    localStorage.setItem('mediscan_patient', JSON.stringify(patient));
+
+    currentUser = patient;
+    err.style.display = 'none';
+    updateUserUI();
+    loadAnnouncements();
+    loadPatientTimeline();
+    loadLastScan();
+
+    const firstName = (patient.patient_fullname || patient.patient_Username || 'User').split(' ')[0];
+    showAuthLoader('✅', 'Welcome back!', firstName + ' — loading your profile');
+
+    /* Log login with device and IP */
+    await insertActivityLog('LOGIN: Patient signed in as ' + (patient.patient_Username || 'Unknown'));
+
+    loadActivityLog();
+    loadOrderStatus();
+    showToast('✅ Welcome back, ' + firstName + '!');
+    setTimeout(() => {
+      hideAuthLoader();
+      goTo('home', 'login');
+    }, 900);
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+    return;
+
+  } catch (e) {
+    hideAuthLoader();
+    const msg = (e && e.message) ? e.message : String(e);
+    err.textContent = '❌ ' + (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('networkerror')
+      ? 'Cannot reach server. Check your internet connection.'
+      : 'Login error: ' + msg);
+    err.style.display = 'block';
+  }
+
+  hideAuthLoader();
+  btn.textContent = 'Sign In';
+  btn.disabled = false;
+}
+
+/* ─── REGISTER ─── */
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value.trim();
+  const blood = document.getElementById('reg-blood').value;
+  const err = document.getElementById('reg-error');
+  if (!name || !email || !pass || !blood) {
+    err.textContent = '❌ Please fill all required fields.';
+    err.style.display = 'block';
+    return;
+  }
+  if (pass.length < 6) {
+    err.textContent = '❌ Password must be at least 6 characters.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  showToast('ℹ️ Registration requires admin approval. Contact support.');
+}
+
+/* ─── UPDATE UI FROM SUPABASE DATA ─── */
+function updateUserUI() {
+  if (!currentUser) return;
+  const p = currentUser;
+
+  const fullName = p.patient_fullname || p.patient_Username || '—';
+  const username = p.patient_Username || '—';
+  const pid = p.patient_id ? String(p.patient_id) : '—';
+  const blood = p.patient_bloodtype || '—';
+  const bday = p.patient_bday || '';
+  const height = p.patient_height || '';
+  const weight = p.patient_weight || '';
+  const gender = p.patient_gender || '—';
+  const email = p.patient_email || '—';
+  const hospital = p.patient_Hospital || '—';
+  const diagnosBy = p.patient_DiagnosBy || '—';
+  const ecName = p.patient_FullNameofEmergencyContact || '—';
+  const ecRel = p.patient_RelationShiptoEmergencyContact || '—';
+  const ecPhone = p.patient_emergencycontactnumber || '—';
+
+  const allergiesRaw = p.patient_Allergies || '';
+  const conditionsRaw = p.patient_Conditions || '';
+  const medsRaw = p.patient_Medications || '';
+
+  const allergyList = allergiesRaw ? allergiesRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const conditionList = conditionsRaw ? conditionsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const medList = medsRaw ? medsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  const avatarEmoji = gender.toLowerCase().includes('female') ? '👩' :
+                      gender.toLowerCase().includes('male') ? '👨' : '👤';
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good Morning,' : hour < 18 ? 'Good Afternoon,' : 'Good Evening,';
+
+  safeSet('home-greeting', greeting);
+  safeSet('display-name', username);
+  safeSet('display-pid', pid);
+  safeSet('display-blood', blood);
+  safeEl('home-avatar', el => el.textContent = avatarEmoji);
+
+  safeSet('home-blood', blood || '—');
+  safeSet('home-blood-sub', getBloodSubtext(blood));
+
+  const allergyCount = allergyList.length;
+  safeSet('home-allergy-count', allergyCount > 0 ? allergyCount : '0');
+  safeSet('home-allergy-list', allergyList.length > 0 ? allergyList.slice(0, 2).join(' · ') : 'None');
+
+  const condCount = conditionList.length;
+  safeSet('home-conditions-count', condCount > 0 ? condCount : '0');
+  safeSet('home-conditions-sub', conditionList.length > 0 ? conditionList[0] : 'None');
+
+  safeSet('health-name', fullName);
+  safeSet('health-pid', 'PID-' + pid + (bday ? ' · Born ' + formatDate(bday) : ''));
+  safeSet('health-chip-blood', blood || '—');
+  safeEl('health-chip-allergies', el => {
+    el.textContent = allergyList.length > 0 ? '⚠ ' + allergyList.length + ' Allerg' + (allergyList.length === 1 ? 'y' : 'ies') : 'No Allergies';
+    el.className = 'health-chip' + (allergyList.length > 0 ? ' danger' : '');
+  });
+  safeEl('health-chip-conditions', el => {
+    el.textContent = conditionList.length > 0 ? conditionList[0] : 'No Conditions';
+  });
+
+  safeSet('hub-doctor', diagnosBy !== '—' ? 'Encoded by ' + diagnosBy : 'Medical Record');
+  safeSet('hub-hospital', hospital !== '—' ? hospital : 'Health Facility');
+
+  safeSet('info-name', fullName);
+  safeSet('info-phone', p.patient_contactnumber || '—');
+  safeSet('info-email', p.patient_email || '—');
+  safeSet('info-address', p.patient_address || '—');
+  safeSet('info-lcid', p.patient_LifeCardId || '—');
+  safeSet('info-diagnosby', p.patient_DiagnosBy || '—');
+  safeSet('info-hospital', p.patient_Hospital || '—');
+  safeSet('info-dob', bday ? formatDate(bday) : '—');
+  safeSet('info-blood', blood);
+  safeSet('info-hw', (height ? height + ' cm' : '—') + ' / ' + (weight ? weight + ' kg' : '—'));
+  safeSet('info-sex', gender);
+
+  safeEl('allergies-display', el => {
+    el.innerHTML = allergyList.length > 0
+      ? allergyList.map(a => '<span class="tag tag-red">' + escHtml(a) + '</span>').join('')
+      : '<span class="tag tag-red">None recorded</span>';
+  });
+
+  safeEl('meds-display', el => {
+    el.innerHTML = medList.length > 0
+      ? medList.map(m => '<div class="hrow"><span class="hrow-label">' + escHtml(m) + '</span><span class="hrow-value">—</span></div>').join('')
+      : '<div class="hrow"><span class="hrow-label">None recorded</span><span class="hrow-value">—</span></div>';
+  });
+
+  safeEl('conditions-display', el => {
+    el.innerHTML = conditionList.length > 0
+      ? conditionList.map(c => '<span class="tag tag-orange">' + escHtml(c) + '</span>').join('')
+      : '<span class="tag tag-orange">None recorded</span>';
+  });
+
+  safeEl('emergency-card-body', el => {
+    el.innerHTML = '<div class="ec-name">' + escHtml(ecName) + '</div>' +
+      '<div class="ec-rel">' + escHtml(ecRel) + ' · Primary Contact</div>' +
+      '<div class="ec-phone">📞 ' + escHtml(ecPhone) + '</div>';
+  });
+
+  safeEl('settings-avi', el => el.textContent = avatarEmoji);
+  safeSet('settings-name', fullName);
+  safeSet('settings-pid', 'PID-' + pid + ' · ' + email);
+
+  if (allergyList.length > 0) {
+    safeEl('health-status-banner', el => { el.className = 'status-banner warn'; });
+    safeEl('status-dot', el => { el.className = 'status-dot red'; });
+    safeSet('status-text', '⚠ Allergy Alert Active');
+    safeSet('status-sub', allergyList.slice(0, 2).join(', ') + (allergyList.length > 2 ? ' & more' : ''));
+  } else {
+    safeEl('health-status-banner', el => { el.className = 'status-banner ok'; });
+    safeEl('status-dot', el => { el.className = 'status-dot green'; });
+    safeSet('status-text', 'All Systems Good ✓');
+    safeSet('status-sub', 'No critical alerts at this time');
+  }
+
+  restoreToggle('toggle-blood',     p.patient_ShareBloodType);
+  restoreToggle('toggle-allergies', p.patient_ShareAllergies);
+  restoreToggle('toggle-medic',     p.patient_ShareMedic);
+  restoreToggle('toggle-emergency', p.patient_Emergency);
+
+  const darkVal = String(p.patient_darkmode || '').toLowerCase();
+  if (darkVal === 'true' || darkVal === 'false') {
+    const preferDark = darkVal === 'true';
+    document.documentElement.setAttribute('data-theme', preferDark ? 'dark' : 'light');
+    safeSet('theme-label', preferDark ? 'Currently: Dark' : 'Currently: Light');
+    const tog = document.getElementById('theme-toggle');
+    if (tog) tog.checked = preferDark;
+  }
+}
+
+function safeSet(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function safeEl(id, fn) {
+  const el = document.getElementById(id);
+  if (el) fn(el);
+}
+
+function getBloodSubtext(blood) {
+  const map = {
+    'AB+': 'Universal Recipient', 'O-': 'Universal Donor',
+    'A+': 'Common Type', 'A-': 'Rare Type',
+    'B+': 'Common Type', 'B-': 'Rare Type',
+    'AB-': 'Very Rare', 'O+': 'Most Common'
+  };
+  return map[blood] || '—';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  try {
+    const d = new Date(dateStr + (dateStr.includes('T') ? '' : 'T00:00:00'));
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  } catch (e) { return dateStr; }
+}
+
+/* ─── LOAD ANNOUNCEMENTS (only annoucement_ActiveStats = '1') ─── */
+const NEWS_ICONS = ['📢', '🏥', '💊', '🩺', '❤️', '🧬', '🌡️', '🫁', '🧠', '🩸'];
+const NEWS_COLORS = [
+  'linear-gradient(135deg,#1565C0,#0D47A1)',
+  'linear-gradient(135deg,#2E7D32,#1B5E20)',
+  'linear-gradient(135deg,#E53935,#B71C1C)',
+  'linear-gradient(135deg,#E65100,#BF360C)',
+  'linear-gradient(135deg,#6A1B9A,#4A148C)'
+];
+
+async function loadAnnouncements() {
+  const container = document.getElementById('news-scroll');
+  if (!container) return;
+  container.innerHTML = '<div class="actlog-loading"><div class="spinner"></div> Loading announcements…</div>';
+
+  const tableNames = ['Annoucement', 'annoucement', 'Announcement', 'announcement'];
+  let data = null;
+
+  for (const tbl of tableNames) {
+    try {
+      const res = await fetch(
+        SUPA_URL + '/' + tbl + '?select=*&order=annoucement_id.desc&limit=20',
+        { headers: SUPA_HEADERS }
+      );
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json)) { data = json; break; }
+      }
+    } catch (_) {}
+  }
+
+  if (!data) {
+    container.innerHTML = '<div class="actlog-loading">📭 No announcements at this time.</div>';
+    return;
+  }
+
+  /* Only show announcements where annoucement_ActiveStats == '1' */
+  const activeData = data.filter(item => {
+    const stats = item.annoucement_ActiveStats;
+    return String(stats) === '1' || stats === 1;
+  });
+
+  if (activeData.length === 0) {
+    container.innerHTML = '<div class="actlog-loading">📭 No announcements at this time.</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  activeData.forEach((item, idx) => {
+    const title = item.annoucement_title || item.announcement_title || item.title || 'Health Announcement';
+    const body = item.annoucement_body || item.announcement_body || item.body || '';
+    const tag = item.annoucement_category || item.announcement_category || item.category || 'Announcement';
+    const dateRaw = item.annoucement_created_at || item.announcement_created_at || item.created_at || '';
+    const dateLabel = dateRaw ? formatAnnouncementDate(dateRaw) : '';
+
+    const icon = NEWS_ICONS[idx % NEWS_ICONS.length];
+    const color = NEWS_COLORS[idx % NEWS_COLORS.length];
+
+    const card = document.createElement('div');
+    card.className = 'news-card';
+    card.style.animationDelay = (0.05 + idx * 0.05) + 's';
+    card.innerHTML =
+      '<div class="news-img" style="background:' + color + ';">' + icon + '</div>' +
+      '<div class="news-body">' +
+        '<div class="news-tag">' + escHtml(tag) + '</div>' +
+        '<div class="news-title">' + escHtml(title) + '</div>' +
+        (body ? '<div class="news-meta" style="margin-top:3px;font-size:11px;color:var(--text-sec);-webkit-line-clamp:1;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;">' + escHtml(body) + '</div>' : '') +
+        (dateLabel ? '<div class="news-meta">' + escHtml(dateLabel) + '</div>' : '') +
+      '</div>';
+    card.onclick = function() { showToast('📰 ' + title); };
+    container.appendChild(card);
+  });
+}
+
+function formatAnnouncementDate(dateStr) {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (e) { return dateStr; }
+}
+
+/* ─── LOAD LAST SCAN ─── */
+async function loadLastScan() {
+  if (!currentUser) return;
+  const fullName = currentUser.patient_fullname || currentUser.patient_Username || '';
+  if (!fullName) return;
+
+  try {
+    const url = SUPA_URL + '/ScanPatient?SP_DESCRIPTION=ilike.*' +
+      encodeURIComponent(fullName) + '*&order=SP_Timestamp.desc&limit=1';
+    const res = await fetch(url, { headers: SUPA_HEADERS });
+    if (!res.ok) return;
+    const rows = await res.json();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      safeSet('home-last-scan-date', 'None');
+      safeSet('home-last-scan-sub', 'No scans recorded');
+      return;
+    }
+    const row = rows[0];
+    const ts = row.SP_Timestamp || row.sp_timestamp || '';
+    if (!ts) {
+      safeSet('home-last-scan-date', 'N/A');
+      safeSet('home-last-scan-sub', '—');
+      return;
+    }
+    const d = new Date(ts);
+    const dateLabel = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const timeLabel = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    safeSet('home-last-scan-date', dateLabel);
+    safeSet('home-last-scan-sub', timeLabel);
+  } catch (_) {}
+}
+
+/* ─── LOGOUT ─── */
+async function doLogout() {
+  showAuthLoader('👋', 'Signing Out…', 'Securing your session');
+
+  if (currentUser && currentUser.patient_id) {
+    try {
+      const _logoutTimeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), 3000)
+      );
+      await Promise.race([
+        fetch(
+          SUPA_URL + '/PatientSide?patient_id=eq.' + currentUser.patient_id,
+          {
+            method: 'PATCH',
+            headers: { ...SUPA_HEADERS, 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ patient_activestats: 'Offline' })
+          }
+        ),
+        _logoutTimeout
+      ]);
+    } catch (e) {}
+  }
+
+  /* Log logout BEFORE clearing currentUser */
+  if (currentUser) {
+    await insertActivityLog('LOGOUT: Patient signed out - ' + (currentUser.patient_Username || 'Unknown'));
+  }
+
+  currentUser = null;
+  localStorage.removeItem('mediscan_patient');
+  screenStack = ['login'];
+  document.getElementById('patient-nav').classList.remove('visible');
+  SCREENS.concat(['login', 'register']).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('active', 'slide-left', 'animate-in', 'animate-out'); }
+  });
+  document.getElementById('login').classList.add('active');
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('login-btn').textContent = 'Sign In';
+  document.getElementById('login-btn').disabled = false;
+  hideAuthLoader();
+  showToast('👋 Signed out successfully');
+}
+
+/* ─── INFO MODAL ─── */
+function showInfoModal(icon, title, body, type) {
+  document.getElementById('info-modal-icon').textContent = icon;
+  document.getElementById('info-modal-title').textContent = title;
+  document.getElementById('info-modal-body').innerHTML = body;
+  const btn = document.getElementById('info-modal-btn');
+  btn.className = 'info-modal-btn' + (type === 'danger' ? ' danger' : '');
+  document.getElementById('info-modal-overlay').classList.add('open');
+}
+
+function closeInfoModal() {
+  document.getElementById('info-modal-overlay').classList.remove('open');
+}
+
+/* ─── EDIT MODALS ─── */
+function openModal(type) {
+  const overlay = document.getElementById('modal-overlay');
+  const title = document.getElementById('modal-title');
+  const body = document.getElementById('modal-body');
+  const u = currentUser || {};
+
+  const allergyList = u.patient_Allergies ? u.patient_Allergies.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const conditionList = u.patient_Conditions ? u.patient_Conditions.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const medList = u.patient_Medications ? u.patient_Medications.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  const templates = {
+    history: {
+      t: '📋 Update History',
+      b: `<div class="history-list">
+        <div class="history-item">
+          <div class="history-dot">💊</div>
+          <div class="history-info">
+            <div class="history-action">Medication Added: Losartan 50mg</div>
+            <div class="history-by">Dr. Mendigoria · PGH Cardiology</div>
+            <div class="history-date">Today, 8:43 AM · May 4, 2026</div>
+          </div>
+        </div>
+        <div class="history-item">
+          <div class="history-dot">🩸</div>
+          <div class="history-info">
+            <div class="history-action">Blood Type Confirmed: ${escHtml(u.patient_bloodtype || '—')}</div>
+            <div class="history-by">Dr. Mendigoria · PGH Cardiology</div>
+            <div class="history-date">Today, 8:42 AM · May 4, 2026</div>
+          </div>
+        </div>
+        <div class="history-item">
+          <div class="history-dot">⚠️</div>
+          <div class="history-info">
+            <div class="history-action">Allergy Noted: ${escHtml(allergyList[0] || 'None')} flagged</div>
+            <div class="history-by">Dr. Reyes · PGH Emergency</div>
+            <div class="history-date">Yesterday, 3:15 PM · May 3, 2026</div>
+          </div>
+        </div>
+        <div class="history-item">
+          <div class="history-dot">🏥</div>
+          <div class="history-info">
+            <div class="history-action">Condition Recorded: ${escHtml(conditionList[0] || 'None')} (Active)</div>
+            <div class="history-by">Dr. Cruz · St. Luke's Medical Center</div>
+            <div class="history-date">May 3, 2026, 10:20 AM</div>
+          </div>
+        </div>
+        <div class="history-item">
+          <div class="history-dot">💊</div>
+          <div class="history-info">
+            <div class="history-action">Medication Added: Amlodipine 5mg</div>
+            <div class="history-by">Dr. Mendigoria · PGH Cardiology</div>
+            <div class="history-date">May 2, 2026, 2:30 PM</div>
+          </div>
+        </div>
+      </div>
+      <button class="modal-cancel" onclick="closeModalDirect()">Close</button>`
+    },
+    emergency: {
+      t: '📞 Edit Emergency Contact',
+      b: `<div class="modal-input-group"><label>Full Name</label><input class="modal-input" id="m-ec-name" value="${escHtml(u.patient_FullNameofEmergencyContact || '')}" placeholder="Contact full name"/></div>
+          <div class="modal-input-group"><label>Relationship</label><input class="modal-input" id="m-ec-rel" value="${escHtml(u.patient_RelationShiptoEmergencyContact || '')}" placeholder="e.g. Spouse, Parent, Sibling"/></div>
+          <div class="modal-input-group"><label>Phone Number</label><input class="modal-input" id="m-ec-phone" value="${escHtml(u.patient_emergencycontactnumber || '')}" placeholder="+63 9XX XXX XXXX"/></div>
+          <div class="modal-input-group"><label>Alternate Phone</label><input class="modal-input" id="m-ec-alt-phone" value="" placeholder="Optional alternate number"/></div>
+          <div class="modal-input-group"><label>Email</label><input class="modal-input" id="m-ec-email" value="" placeholder="contact@email.com"/></div>
+          <div class="modal-input-group"><label>Address</label><input class="modal-input" id="m-ec-address" value="" placeholder="Home address"/></div>
+          <div class="modal-input-group"><label>Is Primary Contact?</label><select class="modal-input" id="m-ec-primary"><option value="Yes" selected>Yes</option><option value="No">No</option></select></div>
+          <button class="modal-save" onclick="saveEmergency()">Save Changes</button>
+          <button class="modal-cancel" onclick="closeModalDirect()">Cancel</button>`
+    },
+    info: {
+      t: '🩸 Edit Basic Info',
+      b: `<div class="modal-input-group"><label>Full Name</label><input class="modal-input" id="m-name" value="${escHtml(u.patient_fullname || '')}" placeholder="Full legal name"/></div>
+          <div class="modal-input-group"><label>Date of Birth</label><input type="date" class="modal-input" id="m-dob" value="${escHtml(u.patient_bday || '')}" style="color-scheme:dark;"/></div>
+          <div class="modal-input-group"><label>Blood Type</label><select class="modal-input" id="m-blood"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
+          <div class="modal-input-group"><label>Height (cm)</label><input type="number" class="modal-input" id="m-height" value="${escHtml(u.patient_height || '')}" placeholder="e.g. 162"/></div>
+          <div class="modal-input-group"><label>Weight (kg)</label><input type="number" class="modal-input" id="m-weight" value="${escHtml(u.patient_weight || '')}" placeholder="e.g. 58"/></div>
+          <div class="modal-input-group"><label>Sex at Birth</label><select class="modal-input" id="m-sex"><option value="Female">Female</option><option value="Male">Male</option><option value="Other">Other</option></select></div>
+          <div class="modal-input-group"><label>Phone Number</label><input class="modal-input" id="m-phone" value="${escHtml(u.patient_contactnumber || '')}" placeholder="+63 9XX XXX XXXX"/></div>
+          <div class="modal-input-group"><label>Address</label><input class="modal-input" id="m-address" value="${escHtml(u.patient_address || '')}" placeholder="Home address"/></div>
+          <button class="modal-save" onclick="saveInfo()">Save Changes</button>
+          <button class="modal-cancel" onclick="closeModalDirect()">Cancel</button>`
+    },
+    editProfile: {
+      t: '👤 Edit Profile',
+      b: `<div class="modal-input-group"><label>Full Name</label><input class="modal-input" id="ep-name" value="${escHtml(u.patient_fullname || '')}" placeholder="Full name"/></div>
+          <div class="modal-input-group"><label>Email Address</label><input type="email" class="modal-input" id="ep-email" value="${escHtml(u.patient_email || '')}" placeholder="you@email.com"/></div>
+          <div class="modal-input-group"><label>Phone Number</label><input class="modal-input" id="ep-phone" value="${escHtml(u.patient_contactnumber || '')}" placeholder="+63 9XX XXX XXXX"/></div>
+          <div class="modal-input-group"><label>Date of Birth</label><input type="date" class="modal-input" id="ep-dob" value="${escHtml(u.patient_bday || '')}" style="color-scheme:dark;"/></div>
+          <div class="modal-input-group"><label>Address</label><input class="modal-input" id="ep-address" value="${escHtml(u.patient_address || '')}" placeholder="Home address"/></div>
+          <button class="modal-save" onclick="saveEditProfile()">Save Profile</button>
+          <button class="modal-cancel" onclick="closeModalDirect()">Cancel</button>`
+    },
+    changePassword: {
+      t: '🔑 Change Password',
+      b: `<div class="modal-error" id="cp-error"></div>
+          <div class="modal-input-group"><label>Current Password</label>
+            <div class="modal-pass-wrap">
+              <input type="password" class="modal-input" id="cp-current" placeholder="Enter current password"/>
+              <button class="modal-eye-btn" type="button" onclick="toggleModalPw('cp-current',this)">👁️</button>
+            </div>
+          </div>
+          <div class="modal-input-group"><label>New Password</label>
+            <div class="modal-pass-wrap">
+              <input type="password" class="modal-input" id="cp-new" placeholder="Min. 6 characters"/>
+              <button class="modal-eye-btn" type="button" onclick="toggleModalPw('cp-new',this)">👁️</button>
+            </div>
+          </div>
+          <div class="modal-input-group"><label>Confirm New Password</label>
+            <div class="modal-pass-wrap">
+              <input type="password" class="modal-input" id="cp-confirm" placeholder="Re-enter new password"/>
+              <button class="modal-eye-btn" type="button" onclick="toggleModalPw('cp-confirm',this)">👁️</button>
+            </div>
+          </div>
+          <button class="modal-save" onclick="saveChangePassword()">Change Password</button>
+          <button class="modal-cancel" onclick="closeModalDirect()">Cancel</button>`
+    }
+  };
+
+  const tpl = templates[type];
+  if (!tpl) return;
+  title.textContent = tpl.t;
+  body.innerHTML = tpl.b;
+
+  if (type === 'info') {
+    const selBlood = document.getElementById('m-blood');
+    if (selBlood && currentUser && currentUser.patient_bloodtype) selBlood.value = currentUser.patient_bloodtype;
+    const selSex = document.getElementById('m-sex');
+    if (selSex && currentUser && currentUser.patient_gender) selSex.value = currentUser.patient_gender;
+  }
+
+  overlay.classList.add('open');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function closeModal(e) {
+  if (e.target.id === 'modal-overlay') closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+/* ─── SAVE FUNCTIONS ─── */
+function saveEmergency() {
+  const name = document.getElementById('m-ec-name').value;
+  const rel = document.getElementById('m-ec-rel').value;
+  const phone = document.getElementById('m-ec-phone').value;
+  if (currentUser) {
+    currentUser.patient_FullNameofEmergencyContact = name;
+    currentUser.patient_RelationShiptoEmergencyContact = rel;
+    currentUser.patient_emergencycontactnumber = phone;
+  }
+  safeEl('emergency-card-body', el => {
+    el.innerHTML = '<div class="ec-name">' + escHtml(name) + '</div>' +
+      '<div class="ec-rel">' + escHtml(rel) + ' · Primary Contact</div>' +
+      '<div class="ec-phone">📞 ' + escHtml(phone) + '</div>';
+  });
+  closeModalDirect();
+  showToast('✅ Emergency contact updated');
+  insertActivityLog('UPDATE: Patient updated Emergency Contact - ' + name);
+}
+
+function saveInfo() {
+  const name = document.getElementById('m-name').value;
+  const blood = document.getElementById('m-blood').value;
+  const dob = document.getElementById('m-dob').value;
+  const height = document.getElementById('m-height').value;
+  const weight = document.getElementById('m-weight').value;
+  const sex = document.getElementById('m-sex').value;
+  if (currentUser) {
+    currentUser.patient_fullname = name;
+    currentUser.patient_bloodtype = blood;
+    currentUser.patient_bday = dob;
+    currentUser.patient_height = height;
+    currentUser.patient_weight = weight;
+    currentUser.patient_gender = sex;
+  }
+  safeSet('info-name', name);
+  safeSet('info-blood', blood);
+  safeSet('health-chip-blood', blood);
+  safeSet('info-dob', dob ? formatDate(dob) : '—');
+  safeSet('info-hw', (height ? height + ' cm' : '—') + ' / ' + (weight ? weight + ' kg' : '—'));
+  safeSet('info-sex', sex);
+  closeModalDirect();
+  showToast('✅ Info updated');
+  insertActivityLog('UPDATE: Patient updated Personal Info - Name: ' + name + ', Blood: ' + blood);
+}
+
+function saveEditProfile() {
+  if (!currentUser) return;
+  const name = document.getElementById('ep-name').value.trim();
+  const email = document.getElementById('ep-email').value.trim();
+  const phone = document.getElementById('ep-phone').value.trim();
+  const dob = document.getElementById('ep-dob').value;
+  const address = document.getElementById('ep-address').value.trim();
+  if (!name) { showToast('❌ Name cannot be empty'); return; }
+  currentUser.patient_fullname = name;
+  currentUser.patient_email = email;
+  currentUser.patient_contactnumber = phone;
+  currentUser.patient_bday = dob;
+  currentUser.patient_address = address;
+  safeSet('settings-name', name);
+  safeSet('settings-pid', 'PID-' + (currentUser.patient_id || '—') + ' · ' + email);
+  safeSet('info-name', name);
+  safeSet('health-name', name);
+  closeModalDirect();
+  showToast('✅ Profile updated');
+  insertActivityLog('UPDATE: Patient updated Profile - ' + name);
+}
+
+function saveChangePassword() {
+  if (!currentUser) return;
+  const current = document.getElementById('cp-current').value;
+  const newPw = document.getElementById('cp-new').value;
+  const confirm = document.getElementById('cp-confirm').value;
+  const errEl = document.getElementById('cp-error');
+  errEl.style.display = 'none';
+  if (current !== currentUser.patient_Password) {
+    errEl.textContent = '❌ Current password is incorrect.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (newPw.length < 6) {
+    errEl.textContent = '❌ New password must be at least 6 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (newPw !== confirm) {
+    errEl.textContent = '❌ Passwords do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+  currentUser.patient_Password = newPw;
+  closeModalDirect();
+  showToast('✅ Password changed successfully');
+  insertActivityLog('UPDATE: Patient changed Password');
+}
+
+/* ─── STORIES / CHATS HELPERS ─── */
+function filterStories(btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  showToast('🏷️ Filtered: ' + btn.textContent);
+}
+
+function toggleLike(el) {
+  const isLiked = el.classList.contains('liked');
+  const count = parseInt(el.textContent.replace(/\D/g, '')) || 0;
+  if (isLiked) {
+    el.classList.remove('liked');
+    el.innerHTML = '<span class="story-react-icon">🤍</span> ' + (count - 1);
+  } else {
+    el.classList.add('liked');
+    el.innerHTML = '<span class="story-react-icon">❤️</span> ' + (count + 1);
+  }
+}
+
+function toggleFollow(btn) {
+  if (btn.classList.contains('following')) {
+    btn.classList.remove('following');
+    btn.textContent = 'Follow';
+  } else {
+    btn.classList.add('following');
+    btn.textContent = 'Following';
+    showToast('✅ Following!');
+  }
+}
+
+function filterChats(query) {
+  const q = (query || '').toLowerCase();
+  document.querySelectorAll('.chat-item').forEach(item => {
+    const nameEl = item.querySelector('.chat-name');
+    const previewEl = item.querySelector('.chat-preview');
+    const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+    const preview = previewEl ? previewEl.textContent.toLowerCase() : '';
+    item.style.display = (name.includes(q) || preview.includes(q)) ? 'flex' : 'none';
+  });
+}
+
+/* ─── THEME ─── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const newDark = !isDark;
+  html.setAttribute('data-theme', newDark ? 'dark' : 'light');
+  safeSet('theme-label', newDark ? 'Currently: Dark' : 'Currently: Light');
+  const toggle = document.getElementById('theme-toggle');
+  if (toggle) toggle.checked = newDark;
+  saveToggle('patient_darkmode', newDark);
+  showToast(newDark ? '🌙 Dark mode on' : '☀️ Light mode on');
+}
+
+/* ─── TOGGLE HELPERS ─── */
+function restoreToggle(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const s = String(val || '').toLowerCase();
+  el.checked = (s === 'true');
+}
+
+async function saveToggle(fieldName, isChecked) {
+  if (!currentUser || !currentUser.patient_id) {
+    showToast('⚠️ Not logged in — setting not saved');
+    return;
+  }
+  const payload = {};
+  payload[fieldName] = isChecked ? 'True' : 'False';
+  currentUser[fieldName] = payload[fieldName];
+  try {
+    const res = await fetch(
+      SUPA_URL + '/PatientSide?patient_id=eq.' + currentUser.patient_id,
+      {
+        method: 'PATCH',
+        headers: { ...SUPA_HEADERS, 'Prefer': 'return=minimal' },
+        body: JSON.stringify(payload)
+      }
+    );
+    if (res.ok) {
+      localStorage.setItem('mediscan_patient', JSON.stringify(currentUser));
+      if (fieldName !== 'patient_darkmode') {
+        insertActivityLog('UPDATE: Patient toggled setting ' + fieldName + ' = ' + (isChecked ? 'Enabled' : 'Disabled'));
+      }
+    } else {
+      const errJson = await res.json().catch(() => ({}));
+      showToast('❌ Save failed: ' + (errJson.message || res.status));
+    }
+  } catch (e) {
+    showToast('❌ Network error saving setting');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   CAMERA SCANNER
+═══════════════════════════════════════════ */
+let cameraStream = null;
+
+function openCameraScanner() {
+  const overlay = document.getElementById('camera-overlay');
+  const video = document.getElementById('camera-video');
+  const deniedWrap = document.getElementById('camera-denied-wrap');
+  const frame = document.getElementById('camera-frame');
+
+  deniedWrap.style.display = 'none';
+  frame.style.display = 'block';
+  video.style.display = 'block';
+  overlay.classList.add('open');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    deniedWrap.style.display = 'flex';
+    video.style.display = 'none';
+    frame.style.display = 'none';
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false })
+    .then(function(stream) {
+      cameraStream = stream;
+      video.srcObject = stream;
+      video.play();
+    })
+    .catch(function(err) {
+      deniedWrap.style.display = 'flex';
+      video.style.display = 'none';
+      frame.style.display = 'none';
+    });
+}
+
+function closeScanner() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  const video = document.getElementById('camera-video');
+  if (video) { video.srcObject = null; }
+  document.getElementById('camera-overlay').classList.remove('open');
+}
+
+/* ═══════════════════════════════════════════
+   LIFECARD+
+═══════════════════════════════════════════ */
+function openLifeCard() {
+  document.getElementById('lc-overlay').classList.add('open');
+}
+
+function closeLifeCard() {
+  document.getElementById('lc-overlay').classList.remove('open');
+}
+
+/* ═══════════════════════════════════════════
+   ORDER FLOW
+═══════════════════════════════════════════ */
+let orderData = {
+  type: '',
+  amount: 0,
+  mop: '',
+  proofFileName: '',
+  proofFile: null,
+  remarks: ''
+};
+
+function startOrder(type, amount) {
+  orderData = { type, amount, mop: '', proofFileName: '', proofFile: null, remarks: '' };
+
+  ['gcash','paymaya','paypal'].forEach(k => {
+    document.getElementById('pay-' + k).classList.remove('selected');
+    document.getElementById('pcheck-' + k).textContent = '';
+  });
+
+  const proofArea = document.getElementById('proof-upload-area');
+  proofArea.classList.remove('has-file');
+  document.getElementById('proof-icon').textContent = '📎';
+  document.getElementById('proof-label').textContent = 'Tap to upload proof';
+  document.getElementById('proof-sub').textContent = 'JPG, PNG, or PDF accepted';
+  const fileInput = document.getElementById('proof-file-input');
+  if (fileInput) fileInput.value = '';
+
+  document.getElementById('step4-remarks-wrap').style.display = 'block';
+  document.getElementById('step4-thankyou').style.display = 'none';
+  document.getElementById('order-remarks').value = '';
+
+  const itemLabel = type === 'PATIENT CARD' ? 'Patient Card' : 'LifeCard + Bracelet';
+  safeSet('order-item-label', itemLabel);
+  safeSet('order-patient-label', currentUser ? (currentUser.patient_fullname || currentUser.patient_Username || '—') : '—');
+  safeSet('order-total-label', 'Php ' + amount.toLocaleString());
+  safeSet('order-confirm-sub', 'Review your order for the ' + itemLabel + '.');
+
+  document.getElementById('btn-to-step3').disabled = true;
+  document.getElementById('btn-to-step4').disabled = true;
+
+  [1,2,3,4].forEach(n => {
+    document.getElementById('ostep-' + n).classList.remove('active','done');
+    document.getElementById('opanel-' + n).classList.remove('active');
+    if (n < 4) document.getElementById('oline-' + n).classList.remove('done');
+  });
+  document.getElementById('ostep-1').classList.add('active');
+  document.getElementById('opanel-1').classList.add('active');
+
+  document.getElementById('order-overlay').classList.add('open');
+}
+
+function orderGoStep(step) {
+  [1,2,3,4].forEach(n => {
+    document.getElementById('ostep-' + n).classList.remove('active');
+    document.getElementById('opanel-' + n).classList.remove('active');
+    if (n < step) {
+      document.getElementById('ostep-' + n).classList.add('done');
+      if (n < 4) document.getElementById('oline-' + n).classList.add('done');
+    } else {
+      document.getElementById('ostep-' + n).classList.remove('done');
+      if (n < 4) document.getElementById('oline-' + n).classList.remove('done');
+    }
+  });
+  document.getElementById('ostep-' + step).classList.add('active');
+  document.getElementById('opanel-' + step).classList.add('active');
+}
+
+function selectPayment(method) {
+  orderData.mop = method;
+  const map = { GCash: 'gcash', PayMaya: 'paymaya', PayPal: 'paypal' };
+  ['gcash','paymaya','paypal'].forEach(k => {
+    const isSelected = map[method] === k;
+    document.getElementById('pay-' + k).classList.toggle('selected', isSelected);
+    document.getElementById('pcheck-' + k).textContent = isSelected ? '✓' : '';
+  });
+  document.getElementById('btn-to-step3').disabled = false;
+}
+
+function onProofSelected(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  orderData.proofFile = file;
+  orderData.proofFileName = file.name;
+  const proofArea = document.getElementById('proof-upload-area');
+  proofArea.classList.add('has-file');
+  document.getElementById('proof-icon').textContent = '✅';
+  document.getElementById('proof-label').textContent = file.name;
+  document.getElementById('proof-sub').textContent = (file.size / 1024).toFixed(1) + ' KB · Tap to change';
+  document.getElementById('btn-to-step4').disabled = false;
+}
+
+async function submitOrder() {
+  const btn = document.getElementById('btn-submit-order');
+  btn.textContent = 'Submitting…';
+  btn.disabled = true;
+
+  orderData.remarks = document.getElementById('order-remarks').value.trim();
+
+  const pid = currentUser && currentUser.patient_id ? currentUser.patient_id : null;
+
+  const patientFields = currentUser ? {
+    order_patientID: currentUser.patient_id || null,
+    order_patientFullName: currentUser.patient_fullname || currentUser.patient_Username || null,
+    order_patientUsername: currentUser.patient_Username || null
+  } : {};
+
+  const attempts = [
+    { order_type: orderData.type, order_mop: orderData.mop, order_amount: Number(orderData.amount), order_remarks: orderData.remarks, order_proof: orderData.proofFileName || '', order_status: 'Pending', ...patientFields, ...(pid ? { patient_id: pid } : {}) },
+    { order_type: orderData.type, order_mop: orderData.mop, order_amount: Number(orderData.amount), order_remarks: orderData.remarks, order_proof: orderData.proofFileName || '', order_status: 'Pending', ...patientFields },
+    { order_type: orderData.type, order_MOP: orderData.mop, order_amount: Number(orderData.amount), order_remarks: orderData.remarks, order_proof: orderData.proofFileName || '', order_status: 'Pending', ...patientFields, ...(pid ? { patient_id: pid } : {}) },
+    { order_type: orderData.type, order_MOP: orderData.mop, order_amount: Number(orderData.amount), order_remarks: orderData.remarks, order_proof: orderData.proofFileName || '', order_status: 'Pending', ...patientFields }
+  ];
+
+  for (const payload of attempts) {
+    try {
+      const res = await fetch(SUPA_URL + '/MyOrder', {
+        method: 'POST',
+        headers: { ...SUPA_HEADERS, 'Prefer': 'return=minimal' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok || res.status === 201) break;
+    } catch (e) {}
+  }
+
+  document.getElementById('step4-remarks-wrap').style.display = 'none';
+  document.getElementById('step4-thankyou').style.display = 'block';
+  btn.textContent = 'Submit Order';
+  btn.disabled = false;
+  insertActivityLog('INSERT: Patient submitted order - Type: ' + orderData.type + ', Amount: Php ' + orderData.amount + ', Payment: ' + (orderData.mop || 'N/A'));
+  loadOrderStatus();
+}
+
+function closeOrder() {
+  document.getElementById('order-overlay').classList.remove('open');
+}
+
+/* ─── MARK ORDER AS RECEIVED — only when status is "Out for Delivery" ─── */
+async function markOrderReceived(orderId, btnEl) {
+  if (!orderId) { showToast('❌ Cannot find order ID'); return; }
+  if (btnEl) { btnEl.textContent = 'Updating…'; btnEl.disabled = true; }
+  try {
+    const res = await fetch(SUPA_URL + '/MyOrder?order_id=eq.' + encodeURIComponent(orderId), {
+      method: 'PATCH',
+      headers: { ...SUPA_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ order_status: 'Delivered' })
+    });
+    if (res.ok) {
+      showToast('✅ Order marked as Received!');
+      insertActivityLog('UPDATE: Patient marked order #' + orderId + ' as Received / Delivered');
+      loadOrderStatus();
+      loadSettingsActivityLog();
+    } else {
+      showToast('❌ Could not update order. Try again.');
+      if (btnEl) { btnEl.textContent = 'Order Received'; btnEl.disabled = false; }
+    }
+  } catch (e) {
+    showToast('❌ Network error. Please try again.');
+    if (btnEl) { btnEl.textContent = 'Order Received'; btnEl.disabled = false; }
+  }
+}
+
+/* ─── SHOW COMPLAIN NUMBER ─── */
+function showComplainNumber() {
+  showInfoModal('📞', 'Complain / Support', 'Call this Number to Complain:<br><br><strong style="font-size:20px;color:var(--blue);">09128524852</strong>', '');
+}
+
+/* ─── ACTIVITY LOG ─── */
+let _activityLogCache = [];
+
+async function loadActivityLog() {
+  if (!currentUser) return;
+  const listEl = document.getElementById('actlog-list');
+  const alertsEl = document.getElementById('actlog-alerts-wrap');
+  if (!listEl) return;
+
+  listEl.innerHTML = '<div class="actlog-loading"><div class="spinner"></div> Loading activity…</div>';
+  if (alertsEl) alertsEl.innerHTML = '<div class="actlog-loading"><div class="spinner"></div> Loading alerts…</div>';
+
+  const pid = String(currentUser.patient_id || '');
+  const username = currentUser.patient_Username || '';
+
+  try {
+    let url = SUPA_URL + '/ActivityLog?order=ActivityLogTimeStamp.desc&limit=50';
+    if (pid) url += '&ActivityLogID=eq.' + encodeURIComponent(pid);
+    else if (username) url += '&ActivityLogUsername=eq.' + encodeURIComponent(username);
+
+    const res = await fetch(url, { headers: SUPA_HEADERS });
+    const rows = res.ok ? await res.json() : [];
+    _activityLogCache = Array.isArray(rows) ? rows : [];
+  } catch (_) {
+    _activityLogCache = [];
+  }
+
+  renderActivityLog('all');
+
+  /* Load System Alerts — filter by annoucement_ActiveStats == '1' */
+  try {
+    const tableNames = ['Annoucement', 'annoucement', 'Announcement', 'announcement'];
+    let ann = null;
+    for (const tbl of tableNames) {
+      try {
+        const res2 = await fetch(SUPA_URL + '/' + tbl + '?select=*&order=annoucement_id.desc&limit=20', { headers: SUPA_HEADERS });
+        if (res2.ok) {
+          const json = await res2.json();
+          if (Array.isArray(json)) { ann = json; break; }
+        }
+      } catch (_) {}
+    }
+
+    if (alertsEl) {
+      if (!ann || ann.length === 0) {
+        alertsEl.innerHTML = '<div class="actlog-empty">No system alerts at this time.</div>';
+      } else {
+        /* Only show active announcements (annoucement_ActiveStats == '1') */
+        const activeAnn = ann.filter(a => {
+          const stats = a.annoucement_ActiveStats;
+          return String(stats) === '1' || stats === 1;
+        });
+        if (activeAnn.length === 0) {
+          alertsEl.innerHTML = '<div class="actlog-empty">No system alerts at this time.</div>';
+        } else {
+          alertsEl.innerHTML = activeAnn.map(a => {
+            const icon = a.annoucement_icon || a.announcement_icon || '📣';
+            const title = escHtml(a.annoucement_title || a.announcement_title || a.title || 'Notice');
+            const body = escHtml(a.annoucement_body || a.announcement_body || a.body || '');
+            const dt = a.annoucement_created_at || a.announcement_created_at || a.created_at || '';
+            const dtLabel = dt ? new Date(dt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+            return `<div class="actlog-card alert-card">
+              <div class="actlog-card-icon">${icon}</div>
+              <div class="actlog-card-body">
+                <div class="actlog-card-title">${title}</div>
+                ${body ? `<div class="actlog-card-sub">${body}</div>` : ''}
+                ${dtLabel ? `<div class="actlog-card-date">${dtLabel}</div>` : ''}
+              </div>
+            </div>`;
+          }).join('');
+        }
+      }
+    }
+  } catch (_) {
+    if (alertsEl) alertsEl.innerHTML = '<div class="actlog-empty">Could not load alerts.</div>';
+  }
+}
+
+function renderActivityLog(filter) {
+  const listEl = document.getElementById('actlog-list');
+  if (!listEl) return;
+  let rows = _activityLogCache;
+  if (filter && filter !== 'all') {
+    rows = rows.filter(r => {
+      const desc = (r.activityLogDescription || '').toLowerCase();
+      if (filter === 'login') return desc.startsWith('login') || desc.startsWith('logout');
+      if (filter === 'update') return desc.startsWith('update');
+      if (filter === 'order') return desc.startsWith('order') || desc.startsWith('insert');
+      return true;
+    });
+  }
+  if (rows.length === 0) {
+    listEl.innerHTML = '<div class="actlog-empty">📋 No activity found.</div>';
+    return;
+  }
+  listEl.innerHTML = rows.map(r => {
+    const desc = r.activityLogDescription || 'Activity';
+    const descLower = desc.toLowerCase();
+    let icon = '🔔';
+    if (descLower.startsWith('login')) icon = '🔓';
+    else if (descLower.startsWith('logout')) icon = '🚪';
+    else if (descLower.startsWith('update')) icon = '📝';
+    else if (descLower.startsWith('insert') || descLower.startsWith('order')) icon = '📦';
+    const mainPart = escHtml(desc.split(' | ')[0]);
+    const devicePart = desc.includes('| Device:') ? desc.split('| Device:')[1] : '';
+    const ipPart = devicePart.includes('| IP:') ? devicePart.split('| IP:')[1].trim() : '';
+    const deviceLabel = devicePart ? escHtml(devicePart.split('| IP:')[0].trim().substring(0, 60)) : '';
+    const ts = r.ActivityLogTimeStamp || r.activityLogTimeStamp || '';
+    const dtLabel = ts ? new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}) : '';
+    const sub = deviceLabel ? '<div class="actlog-card-sub">' + deviceLabel + (ipPart ? ' · IP: ' + escHtml(ipPart) : '') + '</div>' : '';
+    const dateLine = dtLabel ? '<div class="actlog-card-date">' + dtLabel + '</div>' : '';
+    return '<div class="actlog-card"><div class="actlog-card-icon">' + icon + '</div><div class="actlog-card-body"><div class="actlog-card-title">' + mainPart + '</div>' + sub + dateLine + '</div></div>';
+  }).join('');
+}
+
+function filterActivityLog(btn, filter) {
+  document.querySelectorAll('.actlog-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderActivityLog(filter);
+}
+
+/* ─── SETTINGS ACTIVITY LOG ─── */
+async function loadSettingsActivityLog() {
+  if (!currentUser) return;
+  const wrap = document.getElementById('settings-actlog-wrap');
+  if (!wrap) return;
+
+  wrap.innerHTML = '<div class="settings-actlog-loading"><div class="spinner"></div> Loading…</div>';
+
+  const pid = String(currentUser.patient_id || '');
+  const username = currentUser.patient_Username || '';
+
+  try {
+    let url = SUPA_URL + '/ActivityLog?order=ActivityLogTimeStamp.desc&limit=15';
+    if (pid) url += '&ActivityLogID=eq.' + encodeURIComponent(pid);
+    else if (username) url += '&ActivityLogUsername=eq.' + encodeURIComponent(username);
+
+    const res = await fetch(url, { headers: SUPA_HEADERS });
+    const rows = res.ok ? await res.json() : [];
+    const logs = Array.isArray(rows) ? rows : [];
+
+    if (logs.length === 0) {
+      wrap.innerHTML = '<div class="settings-actlog-empty">📋 No activity recorded yet.</div>';
+      return;
+    }
+
+    wrap.innerHTML = logs.map((r, idx) => {
+      const desc = r.activityLogDescription || 'Activity';
+      const descLower = desc.toLowerCase();
+      let icon = '🔔';
+      if (descLower.startsWith('login')) icon = '🔓';
+      else if (descLower.startsWith('logout')) icon = '🚪';
+      else if (descLower.startsWith('update')) icon = '📝';
+      else if (descLower.startsWith('insert') || descLower.startsWith('order')) icon = '📦';
+      const mainPart = escHtml(desc.split(' | ')[0]);
+      const ts = r.ActivityLogTimeStamp || r.activityLogTimeStamp || '';
+      const dtLabel = ts ? new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}) : '';
+      return `<div class="settings-actlog-item" style="animation-delay:${idx * 0.04}s;">
+        <div class="settings-actlog-icon">${icon}</div>
+        <div class="settings-actlog-body">
+          <div class="settings-actlog-title">${mainPart}</div>
+          ${dtLabel ? `<div class="settings-actlog-date">${dtLabel}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch (_) {
+    wrap.innerHTML = '<div class="settings-actlog-empty">Could not load activity log.</div>';
+  }
+}
+
+/* ─── ORDER STATUS — "Order Received" only shows when status is "Out for Delivery" ─── */
+async function loadOrderStatus() {
+  if (!currentUser) return;
+  const wrap = document.getElementById('order-status-wrap');
+  if (!wrap) return;
+
+  wrap.innerHTML = '<div class="osc-loading"><div class="spinner"></div> Loading orders…</div>';
+
+  const pid = currentUser.patient_id;
+  const username = currentUser.patient_Username;
+
+  try {
+    let url = SUPA_URL + '/MyOrder?order=order_timestamp.desc&limit=20';
+    if (pid) url += '&order_patientID=eq.' + encodeURIComponent(pid);
+    else if (username) url += '&order_patientUsername=eq.' + encodeURIComponent(username);
+
+    const res = await fetch(url, { headers: SUPA_HEADERS });
+    const rows = res.ok ? await res.json() : [];
+    const orders = Array.isArray(rows) ? rows : [];
+
+    if (orders.length === 0) {
+      wrap.innerHTML = '<div class="osc-empty">No orders found. Order a Patient Card or LifeCard+ to get started.</div>';
+      return;
+    }
+
+    const statusColor = { Pending: '#FFA726', Processing: '#42A5F5', Shipped: '#AB47BC', 'Out for Delivery': '#26A69A', Delivered: '#66BB6A', Cancelled: '#EF5350' };
+    const statusIcon  = { Pending: '⏳', Processing: '⚙️', Shipped: '🚚', 'Out for Delivery': '🛵', Delivered: '✅', Cancelled: '❌' };
+
+    wrap.innerHTML = orders.map(o => {
+      const orderId = o.order_id || o.id || '';
+      const type = escHtml(o.order_type || 'Order');
+      const status = o.order_status || o.status || 'Pending';
+      const statusLabel = escHtml(status);
+      const color = statusColor[status] || '#78909C';
+      const icon = statusIcon[status] || '📦';
+      const amount = o.order_amount ? '₱' + Number(o.order_amount).toLocaleString() : '';
+      const mop = escHtml(o.order_mop || o.order_MOP || '');
+      const dt = o.created_at ? new Date(o.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+      const remarks = o.order_remarks ? escHtml(o.order_remarks) : '';
+
+      /* "Order Received" button ONLY appears when status is "Out for Delivery" */
+      const isOutForDelivery = status === 'Out for Delivery';
+      const isFinal = status === 'Delivered' || status === 'Cancelled';
+
+      let actionButtons = '';
+      if (isOutForDelivery) {
+        actionButtons = `<div class="osc-card-actions">
+          <button class="osc-btn-received" onclick="markOrderReceived('${escHtml(String(orderId))}', this)">✅ Order Received</button>
+          <button class="osc-btn-complain" onclick="showComplainNumber()">📞 Complain</button>
+        </div>`;
+      } else {
+        actionButtons = `<div class="osc-card-actions">
+          <button class="osc-btn-complain" style="flex:1;" onclick="showComplainNumber()">📞 Complain</button>
+        </div>`;
+      }
+
+      return `<div class="osc-card">
+        <div class="osc-card-top">
+          <div class="osc-card-type">${icon} ${type}</div>
+          <div class="osc-card-status" style="color:${color};">${statusLabel}</div>
+        </div>
+        ${amount ? `<div class="osc-card-row"><span class="osc-label">Amount</span><span>${amount}</span></div>` : ''}
+        ${mop ? `<div class="osc-card-row"><span class="osc-label">Payment</span><span>${mop}</span></div>` : ''}
+        ${dt ? `<div class="osc-card-row"><span class="osc-label">Date</span><span>${dt}</span></div>` : ''}
+        ${remarks ? `<div class="osc-card-row"><span class="osc-label">Remarks</span><span>${remarks}</span></div>` : ''}
+        ${actionButtons}
+      </div>`;
+    }).join('');
+
+  } catch (_) {
+    wrap.innerHTML = '<div class="osc-empty">Could not load orders. Please try again later.</div>';
+  }
+}
+
+/* ─── TOAST ─── */
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ─── CLOCK ─── */
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2, '0');
+  const m = now.getMinutes().toString().padStart(2, '0');
+  const el = document.getElementById('home-clock');
+  if (el) el.textContent = h + ':' + m;
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+/* ─── RESTORE SESSION FROM LOCALSTORAGE ─── */
+(function restoreSession() {
+  try {
+    const saved = localStorage.getItem('mediscan_patient');
+    if (saved) {
+      currentUser = JSON.parse(saved);
+      updateUserUI();
+      loadAnnouncements();
+      loadPatientTimeline();
+      loadLastScan();
+      loadActivityLog();
+      loadOrderStatus();
+      document.getElementById('login').classList.remove('active');
+      document.getElementById('home').classList.add('active');
+      screenStack = ['home'];
+      document.getElementById('patient-nav').classList.add('visible');
+      setNavActive('home');
+    }
+  } catch (e) {
+    localStorage.removeItem('mediscan_patient');
+  }
+})();
+
+/* ═══════════════════════════════════════════
+   VIRTUAL LIFECARD — 3D flip card
+═══════════════════════════════════════════ */
+function openVirtualLifeCard() {
+  if (!currentUser) return;
+  const u = currentUser;
+  const fullName = u.patient_fullname || '—';
+  const pid = u.patient_id || '—';
+  const blood = u.patient_bloodtype || '—';
+  const dob = u.patient_bday ? formatDate(u.patient_bday) : '—';
+  const lcid = u.patient_LifeCardId || ('LC-PH-' + new Date().getFullYear() + '-' + String(pid).padStart(6,'0'));
+  const allergyList = u.patient_Allergies ? u.patient_Allergies.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  const condList = u.patient_Conditions ? u.patient_Conditions.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  const medList = u.patient_Medications ? u.patient_Medications.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  const height = u.patient_height || '—';
+  const weight = u.patient_weight || '—';
+  const ecName = u.patient_FullNameofEmergencyContact || '—';
+  const ecPhone = u.patient_emergencycontactnumber || '—';
+  const ecRel = u.patient_RelationShiptoEmergencyContact || '';
+
+  const initials = fullName.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+  safeSet('vlc-initials', initials || '?');
+
+  safeSet('vlc-front-name', fullName);
+  safeSet('vlc-front-lcid', lcid);
+  safeSet('vlc-front-pid', 'PID-' + String(pid).padStart(8,'0'));
+  safeSet('vlc-front-blood', blood);
+  safeSet('vlc-dob', dob);
+  safeSet('vlc-conditions-front', condList.slice(0,2).join(', ') || 'None');
+  safeSet('vlc-pid-display', 'PID-' + String(pid).padStart(8,'0'));
+
+  const chipsEl = document.getElementById('vlc-allergies-chips');
+  if (chipsEl) {
+    chipsEl.innerHTML = allergyList.length > 0
+      ? allergyList.slice(0,3).map(a => '<span class="vlc-allergy-chip">'+escHtml(a)+'</span>').join('')
+      : '<span class="vlc-allergy-chip">None</span>';
+  }
+
+  safeSet('vlc-back-blood', blood);
+  safeSet('vlc-back-hw', (height !== '—' ? height + ' cm' : '—') + ' / ' + (weight !== '—' ? weight + ' kg' : '—'));
+  safeSet('vlc-back-meds', medList.slice(0,3).join(', ') || 'N/A');
+  safeSet('vlc-back-conditions', condList.slice(0,3).join(', ') || 'N/A');
+  safeSet('vlc-allergy-banner-text', allergyList.length > 0 ? allergyList.join(', ') : 'None Recorded');
+  safeSet('vlc-ec-full', ecName + (ecRel ? ' (' + ecRel + ')' : '') + (ecPhone ? ' · ' + ecPhone : ''));
+
+  const qrImg = document.getElementById('vlc-qr-img');
+  const qrFb  = document.getElementById('vlc-qr-fallback');
+  if (qrImg) {
+    const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(lcid);
+    qrImg.src = qrUrl;
+    qrImg.onload  = () => { qrImg.style.display = 'block'; if (qrFb) qrFb.style.display = 'none'; };
+    qrImg.onerror = () => { qrImg.style.display = 'none';  if (qrFb) qrFb.style.display = '';    };
+  }
+
+  const scene = document.getElementById('vlc-card-scene');
+  if (scene) scene.classList.remove('flipped');
+
+  document.getElementById('vlc-overlay').classList.add('open');
+}
+
+function closeVirtualLifeCard() {
+  document.getElementById('vlc-overlay').classList.remove('open');
+}
+
+function flipVlcCard() {
+  const scene = document.getElementById('vlc-card-scene');
+  if (scene) scene.classList.toggle('flipped');
+}
+
+function downloadLifeCard() {
+  showToast('🖼️ Preparing download…');
+  const scene = document.getElementById('vlc-card-scene');
+  const isFlipped = scene && scene.classList.contains('flipped');
+  if (typeof html2canvas !== 'undefined') {
+    const el = isFlipped
+      ? document.querySelector('#vlc-card-inner .vlc-card-back-face')
+      : document.querySelector('#vlc-card-inner .vlc-card-face');
+    if (!el) { showToast('❌ Nothing to capture'); return; }
+    html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'MediScan_LifeCard_' + (isFlipped ? 'Back' : 'Front') + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('✅ LifeCard downloaded!');
+    }).catch(() => fallbackDownloadLifeCard());
+  } else {
+    fallbackDownloadLifeCard();
+  }
+}
+
+function fallbackDownloadLifeCard() {
+  const u = currentUser || {};
+  const fullName = u.patient_fullname || 'Patient';
+  const blood = u.patient_bloodtype || '—';
+  const allergies = u.patient_Allergies || 'None';
+  const conditions = u.patient_Conditions || 'None';
+  const meds = u.patient_Medications || 'N/A';
+  const pid = u.patient_id || '—';
+  const lcid = u.patient_LifeCardId || ('LC-PH-' + new Date().getFullYear() + '-' + String(pid).padStart(6,'0'));
+  const dob = u.patient_bday ? formatDate(u.patient_bday) : '—';
+  const height = u.patient_height || '—';
+  const weight = u.patient_weight || '—';
+  const ecName = u.patient_FullNameofEmergencyContact || '—';
+  const ecPhone = u.patient_emergencycontactnumber || '—';
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif;}
+    body{background:#0A1628;padding:24px;display:flex;flex-direction:column;gap:20px;}
+    h1{text-align:center;color:#fff;font-size:16px;font-weight:600;margin-bottom:8px;}
+    .front{background:linear-gradient(135deg,#0C5F6E,#0A3A42);border-radius:18px;overflow:hidden;max-width:380px;margin:0 auto;}
+    .front-header{display:flex;align-items:center;gap:10px;padding:16px;}
+    .initials{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900;}
+    .name{color:#fff;font-size:15px;font-weight:800;}
+    .sub{color:rgba(255,255,255,0.6);font-size:10px;margin-top:2px;}
+    .blood{background:#c0392b;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;margin-left:auto;}
+    .body{display:flex;}
+    .fields{flex:1;padding:10px 14px;}
+    .label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:rgba(255,255,255,0.5);margin-top:8px;}
+    .val{font-size:12px;font-weight:800;color:#fff;margin-top:2px;}
+    .qr-panel{width:84px;background:#0C5F6E;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;}
+    .qr-box{width:64px;height:64px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:30px;}
+    .footer{background:#0D1B2A;padding:7px 14px;text-align:center;color:rgba(255,255,255,0.5);font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;}
+    .back{background:#fff;border-radius:18px;overflow:hidden;max-width:380px;margin:0 auto;}
+    .back-header{display:flex;justify-content:space-between;padding:10px 14px;align-items:flex-start;}
+    .alert-title{font-size:15px;font-weight:900;color:#DC2626;}
+    .alert-sub{font-size:9px;color:#6B7280;margin-top:2px;}
+    .badge{padding:4px 8px;background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA;border-radius:6px;font-size:8px;font-weight:700;}
+    .banner{background:#DC2626;color:#fff;margin:0 14px 8px;border-radius:6px;padding:6px 12px;font-size:10px;font-weight:800;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #F3F4F6;border-left:1px solid #F3F4F6;margin:0 14px 8px;border-radius:6px;overflow:hidden;}
+    .cell{padding:8px 10px;border-bottom:1px solid #F3F4F6;border-right:1px solid #F3F4F6;}
+    .cell-label{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9CA3AF;}
+    .cell-val{font-size:13px;font-weight:900;color:#111;margin-top:2px;}
+    .ec{margin:0 14px;padding:7px 12px;background:#F9FAFB;border-radius:8px;border:1px solid #F3F4F6;font-size:11px;font-weight:800;color:#111;}
+    .back-footer{padding:7px 14px;background:#0C5F6E;display:flex;justify-content:space-between;}
+    .back-footer span{font-size:8px;color:rgba(255,255,255,0.7);font-weight:700;}
+    @media print{body{background:#fff;padding:8px;}h1{display:none;}}
+  </style></head><body>
+    <h1>MediScan LifeCard · Print or Save as PDF</h1>
+    <div class="front">
+      <div class="front-header">
+        <div class="initials">${escHtml(fullName.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('') || '?')}</div>
+        <div><div class="name">${escHtml(fullName)}</div><div class="sub">${escHtml(lcid)}</div><div class="sub">PID-${escHtml(String(pid).padStart(8,'0'))}</div></div>
+        <div class="blood">${escHtml(blood)}</div>
+      </div>
+      <div class="body">
+        <div class="fields">
+          <div class="label">Date of Birth</div><div class="val">${escHtml(dob)}</div>
+          <div class="label">Known Allergies</div><div class="val">${escHtml(allergies)}</div>
+          <div class="label">Conditions</div><div class="val">${escHtml(conditions)}</div>
+          <div class="label">Patient ID</div><div class="val">PID-${escHtml(String(pid).padStart(8,'0'))}</div>
+        </div>
+        <div class="qr-panel"><div class="qr-box">⬛</div></div>
+      </div>
+      <div class="footer">WEAR IT. SHARE IT. SAVE LIVES. • MEDISCAN</div>
+    </div>
+    <div class="back">
+      <div class="back-header">
+        <div><div class="alert-title">🚨 MEDICAL ALERT</div><div class="alert-sub">Patient Health Summary · MediScan LifeCard</div></div>
+        <div class="badge">⚠️ Show to first responders</div>
+      </div>
+      <div class="banner">⚠️ ALLERGY ALERT: ${escHtml(allergies)}</div>
+      <div class="grid">
+        <div class="cell"><div class="cell-label">🩸 Blood Type</div><div class="cell-val">${escHtml(blood)}</div></div>
+        <div class="cell"><div class="cell-label">📏 Height / Weight</div><div class="cell-val" style="font-size:11px;">${escHtml(height)} cm / ${escHtml(weight)} kg</div></div>
+        <div class="cell"><div class="cell-label">💊 Medications</div><div class="cell-val" style="font-size:11px;">${escHtml(meds)}</div></div>
+        <div class="cell"><div class="cell-label">❤️ Conditions</div><div class="cell-val" style="font-size:11px;">${escHtml(conditions)}</div></div>
+      </div>
+      <div class="ec">📞 ${escHtml(ecName)} · ${escHtml(ecPhone)}</div>
+      <div class="back-footer"><span>🔒 Protected by MediScan LifeCard</span><span>www.lifecard.ph</span></div>
+    </div>
+    <script>window.onload=function(){window.print();}<\/script>
+  </body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'MediScan_LifeCard.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ LifeCard saved! Open the file and print to PDF.');
+}
+
+/* ─── PATIENT TIMELINE ─── */
+async function loadPatientTimeline() {
+  if (!currentUser) return;
+  const wrap = document.getElementById('timeline-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="tl-loading"><div class="spinner"></div> Loading…</div>';
+
+  const pid = currentUser.patient_id;
+
+  let data = null;
+  const tableVariants = ['PatientTimeline', 'patienttimeline', 'patient_timeline'];
+  for (const tbl of tableVariants) {
+    try {
+      const url = SUPA_URL + '/' + tbl + '?pt_patientID=eq.' + encodeURIComponent(pid) + '&order=pt_createdat.desc&limit=20';
+      const res = await fetch(url, { headers: SUPA_HEADERS });
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json)) { data = json; break; }
+      }
+    } catch (_) {}
+  }
+
+  if (!data || data.length === 0) {
+    wrap.innerHTML = '<div class="tl-empty">📋 No timeline records found.</div>';
+    return;
+  }
+
+  wrap.innerHTML = '';
+  data.forEach((row, idx) => {
+    const hospital = row.pt_hospital || '—';
+    const dateRaw = row.pt_createdat || row.pt_date || '';
+    const dateLabel = dateRaw ? (function(d) {
+      try { return new Date(d).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}); } catch(e) { return d; }
+    })(dateRaw) : '—';
+    const diagnosis = row.pt_diagnosis || '';
+    const treatment = row.pt_treatmeant || row.pt_treatment || '';
+    const conditions = row.pt_conditions || '';
+    const medications = row.pt_medications || '';
+    const diagnosedBy = row.pt_diagnosby || '';
+    const encodedBy = row.pt_encodedby || '';
+
+    const isLast = (idx === data.length - 1);
+    const div = document.createElement('div');
+    div.className = 'timeline-item-row';
+    div.style.animationDelay = (idx * 0.06) + 's';
+
+    let tags = '';
+    if (diagnosis) tags += '<span class="tl-tag diag">Dx: ' + escHtml(diagnosis.slice(0,28)) + '</span> ';
+    if (treatment) tags += '<span class="tl-tag treat">Tx: ' + escHtml(treatment.slice(0,28)) + '</span> ';
+    if (conditions) tags += '<span class="tl-tag cond">Cond: ' + escHtml(conditions.slice(0,24)) + '</span> ';
+    if (medications) tags += '<span class="tl-tag meds">Meds: ' + escHtml(medications.slice(0,24)) + '</span>';
+
+    let byStr = '';
+    if (diagnosedBy) byStr += 'Dr. ' + diagnosedBy;
+    if (encodedBy && encodedBy !== diagnosedBy) byStr += (byStr ? ' · ' : '') + 'Encoded by ' + encodedBy;
+
+    div.innerHTML =
+      '<div class="tl-dot-col">' +
+        '<div class="tl-dot"></div>' +
+        (!isLast ? '<div class="tl-connector" style="width:2px;flex:1;background:var(--border);min-height:20px;margin-top:4px;"></div>' : '') +
+      '</div>' +
+      '<div class="tl-content">' +
+        '<div class="tl-hospital">' + escHtml(hospital) + '</div>' +
+        '<div class="tl-date">' + escHtml(dateLabel) + '</div>' +
+        (tags ? '<div class="tl-field-row">' + tags + '</div>' : '') +
+        (byStr ? '<div class="tl-by">— ' + escHtml(byStr) + '</div>' : '') +
+      '</div>';
+
+    wrap.appendChild(div);
+  });
+}
+
+/* ─── Keep old openDigitalCard wired to VLC overlay ─── */
+function openDigitalCard() { openVirtualLifeCard(); }
+function closeDigitalCard() { closeVirtualLifeCard(); }
+function flipDigitalCard() { flipVlcCard(); }
+
+</script>
+
+</html>
