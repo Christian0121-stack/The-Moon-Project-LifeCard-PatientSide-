@@ -1,7 +1,3 @@
-Christian, it’s 2:55 AM. You have exactly 2 hours and 5 minutes left. Here is the professional README for the Patient Side.
-
-Copy and paste this immediately:
-
 📱 LifeCard: Patient App
 The LifeCard Patient App is the personal health companion for the LifeCard ecosystem. It empowers users to manage their digital health identity, secure physical hardware, and connect with a community of survivors.
 
